@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.media.LiveBroadMapper">
+	<select id="selectLiveBroadTopList" parameterType="mediaParamVo" resultType="liveBroadVo">
+		SELECT
+			MAX(VCNT) AS TOTAL_VCNT, AGE,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '00' THEN VCNT END) AS VCNT_T00,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '01' THEN VCNT END) AS VCNT_T01,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '02' THEN VCNT END) AS VCNT_T02,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '03' THEN VCNT END) AS VCNT_T03,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '04' THEN VCNT END) AS VCNT_T04,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '05' THEN VCNT END) AS VCNT_T05,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '06' THEN VCNT END) AS VCNT_TT06,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '07' THEN VCNT END) AS VCNT_T07,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '08' THEN VCNT END) AS VCNT_T08,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '09' THEN VCNT END) AS VCNT_T09,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '10' THEN VCNT END) AS VCNT_T10,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '11' THEN VCNT END) AS VCNT_T11,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '12' THEN VCNT END) AS VCNT_T12,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '13' THEN VCNT END) AS VCNT_T13,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '14' THEN VCNT END) AS VCNT_T14,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '15' THEN VCNT END) AS VCNT_T15,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '16' THEN VCNT END) AS VCNT_T16,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '17' THEN VCNT END) AS VCNT_T17,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '18' THEN VCNT END) AS VCNT_T18,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '19' THEN VCNT END) AS VCNT_T19,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '20' THEN VCNT END) AS VCNT_T20,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '21' THEN VCNT END) AS VCNT_T21,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '22' THEN VCNT END) AS VCNT_T22,
+			MAX(CASE WHEN <if test="sexGubun != null and sexGubun != '' and sexGubun =='01'" >SEX_GUBUN = 'F' AND</if> <if test="sexGubun != null and sexGubun != '' and sexGubun =='02'" >SEX_GUBUN = 'M' AND</if> DATE_FORMAT(BROAD_DATE, '%H') = '23' THEN VCNT END) AS VCNT_T23
+		FROM(	
+			SELECT 
+				channel, sex_gubun, broad_date,
+				<if test="ageType != null and ageType != '' and ageType == 02">
+					'20대 미만' AS AGE,
+					SUM(age0_vcnt) AS VCNT
+				</if>
+				<if test="ageType != null and ageType != '' and ageType == 03">
+					 '20대' AS AGE,
+					 SUM(age20_vcnt) AS VCNT 
+				</if>
+				<if test="ageType != null and ageType != '' and ageType == 04">
+					'30대' AS AGE,
+					SUM(age30_vcnt) AS VCNT 
+				</if>
+				<if test="ageType != null and ageType != '' and ageType == 05">
+					'40대' AS AGE,
+					SUM(age40_vcnt) AS VCNT
+				</if>
+				<if test="ageType != null and ageType != '' and ageType == 06">
+					'50대' AS AGE,
+					SUM(age50_vcnt) AS VCNT
+				</if>
+			FROM usage_stat_channel
+	 		WHERE BROAD_DATE >=  CONCAT(#{searchValue}, ' 00:00:00')
+	 		<![CDATA[AND BROAD_DATE <=  CONCAT(#{searchValue}, ' 23:59:59') ]]>
+	 		AND CHANNEL = #{channelId}
+	 		AND SEX_GUBUN != 'N'
+	 		<if test="sexGubun != null and sexGubun != ''">
+	 			AND SEX_GUBUN = #{sexGubun}
+	 		</if>
+	 		GROUP BY DATE_FORMAT(BROAD_DATE, '%Y%m%d%H'), SEX_GUBUN
+			order by broad_date
+		) TT
+		
+	</select>
+	
+	<select id="selectLiveBroadTotalTopList" parameterType="mediaParamVo" resultType="liveBroadVo">
+		SELECT 
+				<if test="channelId != null and channelId != '' ">
+				a.channel, 
+				</if>
+				date_format(a.broad_date,'%H:%i') as broad_date,
+			<if test="ageType != null and ageType != '' and ageType == 01">
+				(sum(age0_vcnt)+sum(age20_vcnt)+sum(age30_vcnt)+sum(age40_vcnt)+sum(age50_vcnt)) AS total_vcnt ,
+				(sum(u10)+sum(s10)+sum(s20)+sum(s30)+sum(s40)+sum(o50))/6 AS total_rate 
+			</if>
+			<if test="ageType != null and ageType != '' and ageType == 02">
+				sum(age0_vcnt) AS total_vcnt ,
+				(sum(u10)+sum(s10))/2 AS total_rate 
+			</if>
+			<if test="ageType != null and ageType != '' and ageType == 03">
+				 sum(age20_vcnt) AS total_vcnt ,
+				 sum(s20) AS total_rate 
+			</if>
+			<if test="ageType != null and ageType != '' and ageType == 04">
+				 sum(age30_vcnt) AS total_vcnt ,
+				 sum(s30) AS total_rate 
+			</if>
+			<if test="ageType != null and ageType != '' and ageType == 05">
+				 sum(age40_vcnt) AS total_vcnt ,
+				 sum(s40) AS total_rate 
+			</if>
+			<if test="ageType != null and ageType != '' and ageType == 06">
+				 sum(age50_vcnt) AS total_vcnt ,
+				 sum(o50) AS total_rate 
+			</if>
+		  FROM  usage_stat_channel a ,  m_view_rating b
+	    	WHERE  a.broad_date=b.broad_date and a.channel=b.channel
+		    AND a.BROAD_DATE >=  CONCAT(#{searchValue}, ' 00:00:00')
+	 		<![CDATA[AND a.BROAD_DATE <=  CONCAT(#{searchValue}, ' 23:59:59') ]]> 
+	 	    <if test="channelId != null and channelId != '' ">
+	 			AND a.CHANNEL =#{channelId} 
+	 		</if>
+	 		AND a.SEX_GUBUN != 'N' 
+		<if test="sexGubun != null and sexGubun != ''">
+	 			AND SEX_GUBUN = #{sexGubun}
+	 	</if>
+		group by 
+		<if test="channelId != null and channelId != '' ">
+			channel, 
+		</if>
+			broad_date
+	</select>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.company.CompanyMapper">
+	
+	<select id="selectCompanyList" parameterType="companyParamVo" resultType="companyVo">
+		SELECT 
+			C_SEQ, C_NM, C_TYPE, C_DESC, 
+			USE_YN, INPUT_ID, INPUT_DT, 
+			UPDATE_DT, UPDATE_ID
+		FROM COMPANY
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == 01" >
+					AND C_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == 02" >
+					AND C_TYPE like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+			</if>
+			<if test="useYn != null and useYn !=''">
+				AND USE_YN = #{useYn}
+			</if>
+		</where>
+		ORDER BY C_SEQ
+		LIMIT #{offset}, #{noOfRecords} 
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="companyParamVo" resultType="int">
+        SELECT 
+			COUNT(C_SEQ)
+		FROM COMPANY
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == 01" >
+					AND C_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == 02" >
+					AND C_TYPE = #{cType}
+				</if>
+				
+			</if>
+			<if test="useYn != null and useYn !=''">
+				AND USE_YN = #{useYn}
+			</if>
+		</where>
+    </select>
+	
+	<select id="selectCompanyListNoPage" parameterType="companyParamVo" resultType="companyVo">
+		SELECT 
+			C_SEQ, C_NM, C_TYPE, C_DESC, 
+			USE_YN, INPUT_ID, INPUT_DT, 
+			UPDATE_DT, UPDATE_ID
+		FROM COMPANY
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'" >
+					AND C_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+			<if test="cType != null and cType !=''">
+				AND C_TYPE = #{cType}
+			</if>
+			<if test="useYn != null and useYn !=''">
+				AND USE_YN = #{useYn}
+			</if>
+		</where>
+		ORDER BY C_SEQ
+	</select>
+
+	<insert id="insertCompany" parameterType="companyVo">
+		INSERT INTO COMPANY	(
+			C_NM, 
+			C_TYPE, 
+			C_DESC, 
+			USE_YN, 
+			INPUT_ID, 
+			INPUT_DT
+		) VALUES (
+			#{cNm}, 
+			#{cType}, 
+			#{cDesc}, 
+			#{useYn}, 
+			#{loginUser}, 
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateCompany" parameterType="companyVo">
+		UPDATE COMPANY 
+		<set>
+			<if test="cNm != null and cNm !='' ">C_NM=#{cNm}, </if>
+			<if test="cType != null and cType !='' ">C_TYPE=#{cType}, </if>
+			<if test="cDesc != null and cDesc !='' ">C_DESC=#{cDesc}, </if>
+			<if test="useYn != null and useYn !='' ">USE_YN=#{useYn}, </if>
+		UPDATE_ID=#{loginUser}, 
+		UPDATE_DT=NOW()
+		</set>
+		WHERE C_SEQ=#{cSeq}
+	</update>
+	
+	<select id="selectCSeq" parameterType="companyParamVo" resultType="int">
+		SELECT 
+			C_SEQ
+		FROM COMPANY
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'" >
+					AND C_NM = #{searchValue}
+				</if>
+			</if>
+			<if test="cType != null and cType !=''">
+				AND C_TYPE = #{cType}
+			</if>
+			<if test="useYn != null and useYn !=''">
+				AND USE_YN = #{useYn}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.media.PooqVodMapper">
+	<select id="selectPooqVodList" parameterType="mediaParamVo" resultType="pooqVodVo">
+		SELECT 
+			A.PC_SEQ, A.C_SEQ,
+		 	C.CONTENTS_NM, C.VODCNT, B.P_SEQ, B.PROGRAM_NM, 
+			SUM(A.charge_vtime) AS charge_vtime, SUM(A.h_charge_vtime) AS h_charge_vtime, SUM(A.free_charge_vtime) AS free_charge_vtime, SUM(A.h_free_charge_vtime)AS h_free_charge_vtime,
+			SUM(A.charge_cnt) AS charge_cnt, SUM(A.h_charge_cnt) AS h_charge_cnt, SUM(A.free_charge_cnt) AS free_charge_cnt, SUM(A.h_free_charge_cnt) AS h_free_charge_cnt,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM
+			<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+				,C.BROAD_DATE
+			</if>
+			,SUM(A.charge_vtime)  + SUM(A.h_charge_vtime) + SUM(A.free_charge_vtime) + SUM(A.h_free_charge_vtime) AS TOTAL_VTIME
+			,SUM(A.charge_cnt)  + SUM(A.h_charge_cnt) + SUM(A.free_charge_cnt) + SUM(A.h_free_charge_cnt) AS TOTAL_CNT
+		FROM USAGE_STAT_PROGRAM A , PROGRAM b, CONTENTS c 
+		WHERE A.PC_SEQ=C.PC_SEQ 
+		AND B.P_SEQ=C.P_SEQ 
+		AND A.C_SEQ = 11
+		AND A.PC_SEQ !=-1
+		AND C.REVIEW_YN = 'N'
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND DATE_FORMAT(A.VIEW_DATE,'%Y%m') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') >= #{searchValue} AND DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		<if test="channel != null and channel.size !=0">
+			 AND B.CHANNEL_ID IN 
+			 <foreach collection="channel" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach> 
+		</if>
+			
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == '01'">
+			GROUP BY B.P_SEQ
+		</if>
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == '02'">
+			GROUP BY A.PC_SEQ
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '01'">
+			ORDER BY charge_vtime DESC
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '02'">
+			ORDER BY h_charge_vtime DESC
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '03'">
+			ORDER BY free_charge_vtime DESC
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '04'">
+			ORDER BY h_free_charge_vtime DESC
+		</if>
+		<if test="orderType !=null and orderType !='' and orderType == '05'">
+			ORDER BY charge_cnt DESC
+		</if>
+		<if test="orderType !=null and orderType !='' and orderType == '06'">
+			ORDER BY h_charge_cnt DESC
+		</if>
+		<if test="orderType !=null and orderType !='' and orderType == '07'">
+			ORDER BY free_charge_cnt DESC
+		</if>
+		<if test="orderType !=null and orderType !='' and orderType == '08'">
+			ORDER BY h_free_charge_cnt DESC
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '09'">
+			ORDER BY TOTAL_CNT DESC
+		</if>
+		
+		<if test="orderType !=null and orderType !='' and orderType == '10'">
+			ORDER BY TOTAL_VTIME DESC
+		</if>
+		
+		LIMIT 0, 20
+	</select>
+	
+	
+	
+</mapper>

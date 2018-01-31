@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.UsageStatProgramExcelMapper">
+	
+	<insert id="insertExcelTmpfile" parameterType="fileVo">
+		INSERT INTO TEMP_DATA(
+			C_SEQ,
+			DIST_TYPE,
+			SAVE_DIR,
+			ORIGIN_FILENM,
+			SAVE_FILENM,
+			INPUT_ID,
+			INPUT_DT
+		)VALUES(
+			#{cSeq},
+			#{distType},
+			#{saveDir},
+			#{originFilenm},
+			#{saveFilenm},
+			#{loginUser},
+			NOW()
+		)
+	</insert>
+	
+	<delete id="deleteExcelTmpData" parameterType="fileVo">
+		DELETE FROM TEMP_DATA
+		WHERE ORIGIN_FILENM = #{originFilenm}
+		AND SAVE_FILENM = #{saveFilenm}
+		AND C_SEQ = #{cSeq}
+		AND SAVE_DIR = #{saveDir}
+	</delete>
+	
+	<insert id="insertSaveData" parameterType="standardProgramExcelVo">
+		INSERT INTO SAVE_DATA2(
+			TG_SEQ,
+			STATUS,
+			PROGRAM_NM,
+			BROAD_DATE,
+			VODCNT,
+			VIEW_DATE,
+			PRO_TYPE,
+			AMOUNT,
+			TOTAL_AMOUNT,
+			CHARGE_CNT,
+			H_CHARGE_CNT,
+			FREE_CHARGE_CNT,
+			H_FREE_CHARGE_CNT,
+			INPUT_ID,
+			INPUT_DT
+		)VALUES(
+			#{tgSeq},
+			#{status},
+			#{programNm},
+			#{broadDate},
+			#{vodcnt},
+			#{viewDate},
+			#{proType},
+			#{amount},
+			#{totalAmount},
+			#{chargeCnt},
+			#{hChargeCnt},
+			#{freeChargeCnt},
+			#{hFreeChargeCnt},
+			#{loginUser},
+			NOW()
+		)
+		
+	</insert>
+	
+	<delete id="deleteUsageStatProgramForExcel" parameterType="saveGroupVo">
+		DELETE FROM SAVE_GROUP
+		WHERE TG_SEQ = {tgSeq}
+	</delete>
+		
+</mapper>

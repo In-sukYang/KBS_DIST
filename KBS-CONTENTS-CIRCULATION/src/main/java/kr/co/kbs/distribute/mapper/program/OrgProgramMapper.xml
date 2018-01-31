@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.OrgProgramMapper">
+	<select id="selectOrgProgramList" parameterType="programParamVo" resultType="orgProgramVo" >
+		SELECT 
+			OP_SEQ, O_PROGRAM_ID, O_PROGRAM_NM, 
+			CHANNEL_ID, WEEKDAY, PROGRAM_TYPE, 
+			INPUT_ID, INPUT_DT, UPDATE_ID, DATE_FORMAT(UPDATE_DT,'%Y-%m-%d') AS UPDATE_DT
+		FROM ORG_PROGRAM A
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND O_PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND O_PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>
+		ORDER BY OP_SEQ
+		
+		
+		<if test='pagingYn != null and pagingYn !="" and pagingYn == "Y"'>
+			LIMIT #{offset}, #{noOfRecords} 
+		</if>
+	</select>
+	
+	<select id="selectTotalRecords"  parameterType="programParamVo" resultType="int">
+        SELECT 
+			count(*)
+		FROM ORG_PROGRAM
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND O_PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND O_PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>
+    </select>
+	
+	<insert id="insertOrgProgram" parameterType="orgProgramVo" >
+		INSERT INTO ORG_PROGRAM	(
+			O_PROGRAM_ID,
+			O_PROGRAM_NM, 
+			CHANNEL_ID, 
+			WEEKDAY, 
+			PROGRAM_TYPE, 
+			INPUT_ID, 
+			INPUT_DT)
+		VALUES (
+			#{oProgramId},
+			#{oProgramNm}, 
+			#{channelId}, 
+			#{weekday}, 
+			#{programType}, 
+			#{loginUser}, 
+			NOW())
+	</insert>
+	            
+	<update id="updateOrgProgram" parameterType="orgProgramVo" >
+		UPDATE ORG_PROGRAM
+		<set>
+			<if test="oProgramId != null and oProgramId !='' ">O_PROGRAM_ID=#{oProgramId}, </if>
+			<if test="oProgramNm != null and oProgramNm !='' ">O_PROGRAM_NM=#{oProgramNm}, </if>
+			<if test="channelId != null and channelId !='' ">CHANNEL_Id=#{channelId}, </if>
+			<if test="weekday != null and weekday !='' ">WEEKDAY=#{weekday}, </if>
+			<if test="programType != null and programType !='' ">PROGRAM_TYPE=#{programType}, </if>
+			UPDATE_ID=#{loginUser}, 
+			UPDATE_DT=NOW()
+		</set>
+		WHERE OP_SEQ=#{opSeq}
+	</update>
+	
+</mapper>

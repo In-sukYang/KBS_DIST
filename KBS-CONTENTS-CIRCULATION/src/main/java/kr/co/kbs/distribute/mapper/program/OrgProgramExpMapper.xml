@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.OrgProgramExpMapper">
+	<select id="selectOrgProgramExpList" parameterType="programParamVo" resultType="orgProgramExpVo">
+		SELECT 
+			OPE_SEQ, OP_SEQ, EXP_PROGRAM_NM, 
+			INPUT_ID, INPUT_DT, UPDATE_ID, UPDATE_DT
+		FROM ORG_PROGRAM_EXP
+		WHERE OP_SEQ = #{opSeq}
+		ORDER BY OPE_SEQ 
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int">
+       SELECT 
+			count(OPE_SEQ)
+		FROM ORG_PROGRAM_EXP
+		WHERE OP_SEQ = #{opSeq}
+    </select>
+	
+	<insert id="insertOrgProgramExp" parameterType="orgProgramExpVo">
+		INSERT INTO ORG_PROGRAM_EXP(
+			OP_SEQ, 
+			EXP_PROGRAM_NM, 
+			INPUT_ID, 
+			INPUT_DT
+		)VALUES(
+			#{opSeq}, 
+			#{expProgramNm},
+			#{loginUser},  
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateOrgProgramExp" parameterType="orgProgramExpVo">
+		UPDATE ORG_PROGRAM_EXP
+		<set>
+			<if test="opSeq != null and opSeq !='' ">OP_SEQ=#{opSeq}, </if>
+			<if test="EXP_PROGRAM_NM != null and expProgramNm !='' ">EXP_PROGRAM_NM=#{expProgramNm}, </if>
+			UPDATE_ID=#{loginUser}, 
+			UPDATE_DT=NOW()
+			
+		</set>
+		WHERE OPE_SEQ = #opeSeq 
+	</update>
+	
+	<delete id="deleteOrgProgramExp" parameterType="programParamVo">
+		DELETE FROM ORG_PROGRAM_EXP
+		WHERE OPE_SEQ IN
+		<foreach collection="opeSeq" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

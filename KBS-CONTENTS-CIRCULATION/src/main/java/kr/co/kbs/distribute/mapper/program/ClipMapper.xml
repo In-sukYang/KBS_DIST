@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.ClipMapper">
+	
+	<select id="selectClipList" parameterType="programParamVo" resultType="clipVo">
+		SELECT TT.* FROM(
+			SELECT 
+				A.clip_seq, A.p_seq, A.pc_seq, A.clip_id, A.tg_seq,
+				A.clip_nm, DATE_FORMAT(A.view_date, '%Y-%m-%d') AS VIEW_DATE, A.view_cnt, A.update_id, A.input_dt, A.update_dt,
+				(SELECT PROGRAM_ID FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_ID,
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+				(SELECT CONTENTS_NM FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN ='N') AS CONTENTS_NM,
+				(SELECT CONTENTS_ID FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN ='N') AS CONTENTS_ID,
+				(SELECT STATUS FROM SAVE_GROUP WHERE TG_SEQ = A.TG_SEQ) AS STATUS
+				
+			FROM Clip A
+			<where>
+				<if test="searchValue !=null and searchValue !=''">
+					<if test="searchType != null and searchType !='' and searchType == '01'">
+						AND A.CLIP_ID like CONCAT('%',#{searchValue},'%')
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '02'">
+						AND A.CLIP_NM like CONCAT('%',#{searchValue},'%')
+					</if>
+				</if>
+			</where>
+		)TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+					<if test="searchType != null and searchType !='' and searchType == '03'">
+						AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '04'">
+						AND TT.PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+					</if>
+				</if>
+		
+		</where>
+		ORDER BY clip_seq
+		LIMIT #{offset}, #{noOfRecords}
+		
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int" >
+       SELECT COUNT(CLIP_SEQ) FROM(
+			SELECT 
+				A.clip_seq, A.p_seq, A.pc_seq, A.clip_id, A.tg_seq,
+				A.clip_nm, DATE_FORMAT(A.view_date, '%Y-%m-%d') AS VIEW_DATE, A.view_cnt, A.update_id, A.input_dt, A.update_dt,
+				(SELECT PROGRAM_ID FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_ID,
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+				(SELECT CONTENTS_NM FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN = 'N') AS CONTENTS_NM,
+				(SELECT CONTENTS_ID FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN = 'N') AS CONTENTS_ID,
+				(SELECT STATUS FROM SAVE_GROUP WHERE TG_SEQ = A.TG_SEQ) AS STATUS
+				
+			FROM Clip A
+			<where>
+				<if test="searchValue !=null and searchValue !=''">
+					<if test="searchType != null and searchType !='' and searchType == '01'">
+						AND A.CLIP_ID like CONCAT('%',#{searchValue},'%')
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '02'">
+						AND A.CLIP_NM like CONCAT('%',#{searchValue},'%')
+					</if>
+				</if>
+			</where>
+		)TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+					<if test="searchType != null and searchType !='' and searchType == '03'">
+						AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '04'">
+						AND TT.PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+					</if>
+				</if>
+		
+		</where>
+    </select>
+
+	<insert id="insertClip" parameterType="clipVo">
+		INSERT INTO clip(
+			p_seq, 
+			pc_seq, 
+			clip_id, 
+			clip_nm, 
+			view_date, 
+			view_cnt, 
+			input_dt
+		)VALUES (
+			#{pSeq}, 
+			#{pcSeq}, 
+			#{clipId}, 
+			#{clipNm}, 
+			#{viewDate}, 
+			#{viewCnt}, 
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateClip" parameterType="clipVo">
+		UPDATE CLIP
+			<set>
+				<if test="pSeq != null and pSeq != 0 ">p_seq=#{pSeq}, </if>
+				<if test="pcSeq != null and pcSeq != 0 ">pc_seq=#{pcSeq}, </if>
+				<if test="clipId != null and clipId !='' ">clip_id=#{clipId}, </if>
+				<if test="clipNm != null and clipNm !='' ">clip_nm=#{clipNm}, </if>
+				<if test="viewDate != null and viewDate !='' ">view_date=#{viewDate}, </if>
+				<if test="viewCnt != null and viewCnt !='' ">view_cnt=#{viewCnt}, </if>
+			
+				UPDATE_ID=#{loginUser},
+				UPDATE_DT=NOW()
+			</set>
+		WHERE clip_seq=#{clipSeq}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.rate.MinuteRateMapper">
+	<select id="selectMinuteRateList" parameterType="rateParamVo" resultType="minuteRateVo">
+		SELECT 
+			mvr_seq, tg_seq, broad_date, research_agency, area, channel, air_time, 
+			house, personal, cable, wireless, man, woman, u10, s10, s20, s30, s40, o50, mu10, 
+			ms10, ms20, ms30, ms40, mo50, wu10, ws10, ws20, ws30, ws40, wo50,
+			un_el, mi_sc, mi_gr, hi_gr, ov_un, ho_wife, un_income_150, 
+			ov_income_150, income_200, income_300, income_400, ov_income_500, 
+			IFNULL((SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = A.CHANNEL), '') AS CHANNEL_NM,
+			input_id, input_dt, update_id, update_dt
+		FROM m_view_rating A
+		<where>
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				<if test="startDate !=null and startDate !=''">
+					AND DATE_FORMAT(broad_date,'%Y%m%d') >= #{startDate} 
+				</if>
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				<if test="startDate !=null and startDate !=''">
+					AND DATE_FORMAT(broad_date,'%Y%m%d') >= #{startDate} 
+				</if>
+				<if test="endDate !=null and endDate !=''">
+				 <![CDATA[
+					AND DATE_FORMAT(broad_date,'%Y%m%d') <= #{endDate}
+				]]> 
+				</if>
+			</if>
+		</where>
+		ORDER BY mvr_seq
+		LIMIT #{offset}, #{noOfRecords}
+		
+	</select>
+	<select id="selectTotalRecords" parameterType="rateParamVo" resultType="int">
+		SELECT 
+			count(mvr_seq)
+		FROM m_view_rating
+		<where>
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				<if test="startDate !=null and startDate !=''">
+					AND DATE_FORMAT(broad_date,'%Y%m%d') >= #{startDate} 
+				</if>
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				<if test="startDate !=null and startDate !=''">
+					AND DATE_FORMAT(broad_date,'%Y%m%d') >= #{startDate} 
+				</if>
+				<if test="endDate !=null and endDate !=''">
+				 <![CDATA[
+					AND DATE_FORMAT(broad_date,'%Y%m%d') <= #{endDate}
+				]]> 
+				</if>
+			</if>
+		</where>
+		
+	</select>
+	
+	<insert id="insertMinuteRate" parameterType="minuteRateVo">
+		INSERT INTO m_view_rating(
+			tg_seq, 
+			broad_date, 
+			research_agency, 
+			area, 
+			channel, 
+			air_time, 
+			house, 
+			personal, 
+			cable, 
+			wireless, 
+			man, 
+			woman, 
+			u10, 
+			s10, 
+			s20, 
+			s30, 
+			s40, 
+			o50, 
+			mu10, 
+			ms10, 
+			ms20, 
+			ms30, 
+			ms40, 
+			mo50, 
+			wu10, 
+			ws10, 
+			ws20, 
+			ws30, 
+			ws40, 
+			wo50, 
+			un_el, 
+			mi_sc, 
+			mi_gr, 
+			hi_gr, 
+			ov_un, 
+			ho_wife, 
+			un_income_150, 
+			ov_income_150, 
+			income_200, 
+			income_300, 
+			income_400, 
+			ov_income_500, 
+			input_id, 
+			input_dt
+		)VALUES (
+			#{tgSeq},
+			#{broadDate},
+			
+			#{researchAgency},
+			#{area},
+			#{channel},
+			#{airTime},
+			
+			#{house},
+			#{personal},
+			#{cable},
+			#{wireless},
+			#{man},
+			#{woman},
+			
+			#{u10},
+			#{s10},
+			#{s20},
+			#{s30},
+			#{s40},
+			#{o50},
+			
+			#{mu10},
+			#{ms10},
+			
+			#{ms20},
+			#{ms30},
+			#{ms40},
+			#{mo50},
+			
+			#{wu10},
+			#{ws10},
+			#{ws20},
+			#{ws30},
+			#{ws40},
+			#{wo50},
+			
+			#{unEl},
+			#{miSc},
+			#{miGr},
+			#{hiGr},
+			#{ovUn},
+			#{hoWife},
+			
+			#{unIncome150},
+			#{ovIncome150},
+			
+			#{income200},
+			#{income300},
+			#{income400},
+			#{ovIncome500},
+			#{loginUser},
+			NOW()
+		)
+	
+	</insert>
+	
+</mapper>

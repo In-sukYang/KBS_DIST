@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.ProgramContentMapper">
+	<select id="selectProgramContentList" parameterType="programParamVo" resultType="programContentVo">
+		SELECT TT.* FROM (	
+			SELECT 
+				PC_SEQ, 
+				(SELECT PROGRAM_ID FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_ID, 
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+				(SELECT O_PROGRAM_ID FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_ID,  
+		    	(SELECT O_PROGRAM_NM FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_NM, 
+				op_seq, p_seq, contents_id, 
+				contents_nm, corner_id, weekday, 
+				menual_yn, vodcnt, contents_type, broad_date, 
+				DATE_FORMAT(BROAD_STDT, '%Y-%m-%d %H:%i:%S') AS broad_stdt, DATE_FORMAT(BROAD_EDDT, '%Y-%m-%d %H:%i:%S') AS broad_eddt, 
+				input_id, input_dt, update_id, update_dt
+			FROM contents A
+			WHERE REVIEW_YN ='N'
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CONTENTS_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CONTENTS_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					AND BROAD_DATE = #{searchValue}
+				</if>
+			</if>
+			
+		) TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '04'">
+						AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>	
+		ORDER BY PC_SEQ
+		LIMIT #{offset}, #{noOfRecords}
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int" >
+        SELECT COUNT(PC_SEQ) FROM (	
+			SELECT 
+				PC_SEQ, 
+				(SELECT PROGRAM_ID FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_ID, 
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+				(SELECT O_PROGRAM_ID FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_ID,  
+		    	(SELECT O_PROGRAM_NM FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_NM, 
+				op_seq, p_seq, contents_id, 
+				contents_nm, corner_id, weekday, 
+				menual_yn, vodcnt, contents_type, broad_date, 
+				DATE_FORMAT(BROAD_STDT, '%Y-%m-%d %H:%i:%S') AS broad_stdt, DATE_FORMAT(BROAD_EDDT, '%Y-%m-%d %H:%i:%S') AS broad_eddt, 
+				input_id, input_dt, update_id, update_dt
+			FROM contents A
+			WHERE REVIEW_YN ='N'
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CONTENTS_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CONTENTS_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					AND BROAD_DATE = #{searchValue}
+				</if>
+			</if>
+			
+		) TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '04'">
+						AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>		
+    </select>
+	
+	<insert id="insertProgramContent" parameterType="programContentVo">
+		INSERT INTO contents(
+			op_seq, 
+			p_seq, 
+			contents_id, 
+			contents_nm, 
+			corner_id, 
+			weekday, 
+			menual_yn,
+			vodcnt, 
+			contents_type, 
+			<if test="broadDate != null and broadDate !='' ">BROAD_DATE, </if>
+			<if test="broadStdt != null and broadStdt !='' ">BROAD_STDT, </if>
+			<if test="broadEddt != null and broadEddt !='' ">BROAD_EDDT, </if> 
+			input_id, 
+			input_dt
+		)VALUES (
+			#{opSeq}, 
+			#{pSeq}, 
+			#{contentsId}, 
+			#{contentsNm}, 
+			#{cornerId}, 
+			#{weekday}, 
+			#{menualYn}, 
+			#{vodcnt}, 
+			#{contentsType}, 
+			<if test="broadDate != null and broadDate !='' ">#{broadDate}, </if>
+			<if test="broadStdt != null and broadStdt !='' ">#{broadStdt}, </if>
+			<if test="broadEddt != null and broadEddt !='' ">#{broadEddt}, </if>
+			#{loginUser}, 
+			NOW()
+		)
+	</insert>
+
+	<update id="updateProgramContent" parameterType="programContentVo">
+		UPDATE contents
+		<set>
+			<if test="opSeq != null and opSeq !='' ">OP_SEQ=#{opSeq}, </if>
+			<if test="pSeq != null and pSeq !='' ">P_SEQ=#{pSeq}, </if>
+			<if test="contentsId != null and contentsId !='' ">CONTENTS_ID=#{contentsId}, </if>
+			<if test="contentsNm != null and contentsNm !='' ">CONTENTS_NM=#{contentsNm}, </if>
+			<if test="cornerId != null and cornerId !='' ">CORNER_ID=#{cornerId}, </if>
+			<if test="weekday != null and weekday !='' ">WEEKDAY=#{weekday}, </if>
+			<if test="menualYn != null and menualYn !='' ">MENUAL_YN=#{menualYn}, </if>
+			<if test="vodcnt != null and vodcnt !='' ">VODCNT=#{vodcnt}, </if>
+			<if test="contentsType != null and contentsType !='' ">CONTENTS_TYPE=#{contentsType}, </if>
+			<if test="broadDate != null and broadDate !='' ">BROAD_DATE=#{broadDate}, </if>
+			<if test="broadStdt != null and broadStdt !='' ">BROAD_STDT=#{broadStdt}, </if>
+			<if test="broadEddt != null and broadEddt !='' ">BROAD_EDDT=#{broadEddt}, </if>
+			update_id=#{loginUser},
+			update_dt=NOW()
+		</set>
+		WHERE PC_SEQ = #{pcSeq}
+	</update>
+</mapper>

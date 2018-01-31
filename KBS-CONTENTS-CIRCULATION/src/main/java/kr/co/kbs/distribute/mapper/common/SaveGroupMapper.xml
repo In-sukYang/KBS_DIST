@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.common.SaveGroupMapper">
+	<select id="selectMaxKey" resultType="int">
+		SELECT MAX(TG_SEQ) FROM SAVE_GROUP
+	</select>
+	
+	<insert id="insertSaveGroup" parameterType="saveGroupVo" >
+		INSERT INTO SAVE_GROUP(
+			C_SEQ,
+			DIST_TYPE,
+			ATTACH_FILE,
+			ATTACH_FILE_REAL,
+			ATTACH_FILE_DIR,
+			STATUS,
+			INPUT_ID,
+			INPUT_DT
+		)VALUES(
+			#{cSeq},
+			#{distType},
+			#{attachFile},
+			#{attachFileReal},
+			#{attachFileDir},
+			'A',
+			#{loginUser},
+			NOW()
+		)
+	
+	</insert>
+	
+	<update id="updateSaveGroup" parameterType="saveGroupVo">
+		UPDATE SAVE_GROUP 
+		<set>
+			<if test="cSeq != null and cSeq !=0">C_SEQ = #{cSeq},</if>
+			<if test="distType != null and distType != ''">DIST_TYPE = #{distType},</if>
+			<if test="attachFile != null and attachFile != ''">ATTACH_FILE = #{attachFile},</if>
+			<if test="attachFileDir != null and attachFileDir != ''">ATTACH_FILE_DIR = #{attachFileDir},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			UPDATE_ID = #{loginUser},
+			UPDATE_DT = NOW()
+		</set>
+		WHERE TG_SEQ = #{tgSeq}
+	</update>
+	
+	<delete id="deleteSaveGroup" parameterType="fileVo">
+		DELETE FROM SAVE_GROUP
+		WHERE attachFileReal = #{originFilenm}
+		AND ATTACH_FILE = #{saveFilenm}
+		AND C_SEQ = #{cSeq}
+		AND attachFileDir = #{saveDir}
+	</delete>
+	
+	<select id="selectSaveGroup" parameterType="programParamVo" resultType="saveGroupVo">
+		SELECT 
+			TG_SEQ, C_SEQ, (SELECT C_NM FROM COMPANY WHERE C_SEQ = A.C_SEQ) AS C_NM, 
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = '06' AND CODE_ID = A.DIST_TYPE) AS DIST_TYPE_NM,
+			STATUS,
+			ATTACH_FILE_REAL, INPUT_ID, DATE_FORMAT(INPUT_DT, '%Y-%m-%d') AS INPUT_DT, 
+			UPDATE_ID, DATE_FORMAT(UPDATE_DT, '%Y-%m-%d') AS UPDATE_DT
+		FROM SAVE_GROUP A
+		<where>
+			<if test="distType != null and distType != ''">
+				AND A.DIST_TYPE = #{distType}
+			</if>
+		
+			<if test="status != null and status != ''">
+				AND A.STATUS = #{status}
+			</if>
+			
+			<if test="inputDate != null and inputDate != ''">
+				AND A.INPUT_DT >= CONCAT(#{inputDate}, ' 00:00:00' )
+			<![CDATA[	AND A.INPUT_DT <= CONCAT(#{inputDate}, ' 23:59:59' ) ]]>
+			</if>
+		</where>
+		ORDER BY TG_SEQ
+		LIMIT #{offset}, #{noOfRecords}	
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int">
+		SELECT 
+			count(1)
+		FROM SAVE_GROUP A
+		<where>
+			<if test="distType != null and distType != ''">
+				AND A.DIST_TYPE = #{distType}
+			</if>
+		
+			<if test="status != null and status != ''">
+				AND A.STATUS = #{status}
+			</if>
+			
+			<if test="inputDate != null and inputDate != ''">
+				AND A.INPUT_DT >= CONCAT(#{inputDate}, ' 00:00:00' )
+				<![CDATA[	AND A.INPUT_DT <= CONCAT(#{inputDate}, ' 23:59:59' ) ]]>
+			</if>
+		</where>
+			
+	</select>
+	
+</mapper>

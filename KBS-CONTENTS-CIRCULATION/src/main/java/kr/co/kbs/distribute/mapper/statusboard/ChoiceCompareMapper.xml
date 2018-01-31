@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.statusboard.ChoiceCompareMapper">
+
+	<select id="selectChoiceCompareList" parameterType="statusBoardParamVo" resultType="sameTimeCompareVo">
+		SELECT 
+			A.BROAD_DATE, B.PROGRAM_NM,
+			IFNULL((SELECT VIEW_RATING FROM DC_VIEW_RATING WHERE PC_SEQ = A.PC_SEQ AND STAT_CODE = '00'), 0) / COUNT(1) AS VIEW_RATING,
+			(SELECT  
+				COALESCE(SUM(charge_cnt),0) + COALESCE(SUM(h_charge_cnt),0) + 
+				COALESCE(SUM(free_charge_cnt),0) + COALESCE(SUM(H_free_charge_cnt),0)
+		 	FROM USAGE_STAT_PROGRAM WHERE C_SEQ =11 AND PC_SEQ = A.PC_SEQ) AS POOQ_VOD,
+			(SELECT  
+				COALESCE(SUM(charge_cnt),0) + COALESCE(SUM(h_charge_cnt),0) + 
+				COALESCE(SUM(free_charge_cnt),0) + COALESCE(SUM(H_free_charge_cnt),0)
+		 		FROM USAGE_STAT_PROGRAM WHERE C_SEQ !=11 AND C_SEQ !=12 AND PRO_TYPE='PPM' AND PC_SEQ = A.PC_SEQ) AS TV_VOD,
+			(SELECT COALESCE(SUM(VIEW_CNT),0) FROM CLIP WHERE PC_SEQ = A.PC_SEQ	) AS clip_cnt,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM, B.WEEKDAY,
+			CHANNEL_ID, VODCNT
+		FROM CONTENTS A, PROGRAM B
+		WHERE A.P_SEQ = B.P_SEQ
+		AND A.REVIEW_YN = 'N'
+		<if test="pSeqList != null and pSeqList.size != 0">
+			AND B.P_SEQ IN
+			<foreach collection="pSeqList" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		
+		</if>
+		AND A.BROAD_DATE >= #{searchValue}
+		<![CDATA[
+		AND A.BROAD_DATE <= #{searchValue2}
+		]]>
+		GROUP BY A.BROAD_DATE, B.P_SEQ
+		ORDER BY A.BROAD_DATE
+	</select>
+
+</mapper>

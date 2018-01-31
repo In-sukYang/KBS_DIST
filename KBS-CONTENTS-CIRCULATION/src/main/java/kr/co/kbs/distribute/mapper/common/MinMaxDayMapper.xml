@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.common.MinMaxDayMapper">
+	<select id="selectUsageStatProgramMinMaxDay" parameterType="String" resultType="minMaxDayVo">
+		SELECT 
+			DATE_FORMAT(MIN(VIEW_DATE), '%Y-%m-%d') AS MIN_DAY, 
+			DATE_FORMAT(MAX(VIEW_DATE), '%Y-%m-%d') AS MAX_DAY 
+		FROM USAGE_STAT_PROGRAM
+		<if test="_parameter != null and _parameter != '' and _parameter == '01'">
+			WHERE C_SEQ = 11
+		</if>
+		<if test="_parameter != null and _parameter != '' and _parameter == '02'">
+			WHERE C_SEQ != 11
+		</if>
+	</select>
+	
+	<select id="selectClipMinMaxDay" resultType="minMaxDayVo">
+		SELECT 
+			DATE_FORMAT(MIN(VIEW_DATE), '%Y-%m-%d') AS MIN_DAY, 
+			DATE_FORMAT(MAX(VIEW_DATE), '%Y-%m-%d') AS MAX_DAY 
+		FROM CLIP
+	</select>
+	 
+	<select id="selectDcViewRatingMinMaxDay" resultType="minMaxDayVo">
+		SELECT 
+			DATE_FORMAT(MIN(BROAD_DATE), '%Y-%m-%d') AS MIN_DAY, 
+			DATE_FORMAT(MAX(BROAD_DATE), '%Y-%m-%d') AS MAX_DAY 
+		FROM DC_VIEW_RATING
+	</select>
+	
+	<select id="selectContentsMinMaxDay" resultType="minMaxDayVo">
+		SELECT 
+			DATE_FORMAT(MIN(BROAD_DATE), '%Y-%m-%d') AS MIN_DAY, 
+			DATE_FORMAT(MAX(BROAD_DATE), '%Y-%m-%d') AS MAX_DAY 
+		FROM CONTENTS
+	</select>
+	
+	
+</mapper>

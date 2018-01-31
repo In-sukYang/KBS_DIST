@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.member.MemberMapper">
+	
+	<select id="selectMemberList" parameterType="memberParamVo" resultType="memberVo">
+		SELECT 
+			U_SEQ, C_SEQ, 
+			USER_ID, USER_PW, 
+			USER_NM, USER_DESC, U_AUTH_TYPE, 
+			USE_YN, INPUT_ID, INPUT_DT, UPDATE_ID, 
+			UPDATE_DT
+		FROM USER
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND USER_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND USER_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>
+		ORDER BY U_SEQ
+		LIMIT #{offset}, #{noOfRecords} 
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="memberParamVo" resultType="int">
+		SELECT 
+			count(U_SEQ)
+		FROM USER
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND USER_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND USER_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insertMember" parameterType="memberVo">
+		INSERT INTO USER(
+			C_SEQ, 
+			USER_ID, 
+			USER_PW, 
+			USER_NM, 
+			USER_DESC, 
+			U_AUTH_TYPE, 
+			USE_YN, 
+			INPUT_ID, 
+			INPUT_DT)
+			VALUES (
+				#{cSeq}, 
+				#{userId}, 
+				#{userPw}, 
+				#{userNm}, 
+				#{userDesc}, 
+				#{uAuthType}, 
+				#{useYn}, 
+				#{loginUser}, 
+				NOW()
+			)
+	</insert>
+	
+	<update id="updateMember" parameterType="memberVo">
+		UPDATE user
+		<set>
+			<if test="cSeq !=0 ">C_SEQ=#{cSeq}, </if>
+			<if test="userId != null and userId !='' ">USER_ID=#{userId}, </if>
+			<if test="userPw != null and userPw !='' ">USER_PW=#{userPw}, </if>
+			<if test="userNm != null and userNm !='' ">USER_NM=#{userNm}, </if>
+			<if test="userDesc != null and userDesc !='' ">USER_DESC=#{userDesc}, </if>
+			<if test="uAuthType != null and uAuthType !='' ">U_AUTH_TYPE=#{uAuthType}, </if>
+			<if test="useYn != null and useYn !='' ">USE_YN=#{useYn}, </if>
+		UPDATE_ID=#{loginUser}, 
+		UPDATE_DT=NOW()
+		</set>
+		WHERE U_SEQ=#{uSeq}
+	</update>
+	
+</mapper>
+

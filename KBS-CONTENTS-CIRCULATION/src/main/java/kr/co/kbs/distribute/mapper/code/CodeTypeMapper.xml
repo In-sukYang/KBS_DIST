@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.code.CodeTypeMapper">
+	<select id="selectCodeTypeList" parameterType="codeParamVo" resultType="codeTypeVo">
+		SELECT 
+			CODE_TYPE, CODE_TYPE_NM
+		FROM CODE_TYPE
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CODE_TYPE like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CODE_TYPE_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="codeParamVo" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM CODE_TYPE
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CODE_TYPE like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CODE_TYPE_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+			</if>
+		</where>
+	
+	</select>
+	
+	<insert id="insertCodeType" parameterType="codeTypeVo">
+		INSERT INTO CODE_TYPE(
+			CODE_TYPE, 
+			CODE_TYPE_NM 
+		)VALUES(
+			#{codeType}, 
+			#{codeTypeNm} 
+		)
+	</insert>
+	
+	<update id="updateCodeType" parameterType="codeTypeVo">
+		UPDATE CODE_TYPE
+		<set>
+			<if test="codeType != null and codeType !='' ">CODE_TYPE=#{codeType}, </if>
+			<if test="codeTypeNm != null and codeTypeNm !='' ">CODE_TYPE_NM=#{codeTypeNm}, </if>
+		</set>
+		WHERE CODE_TYPE=#{codeType}
+	</update>
+	
+	<delete id="deleteCodeType" parameterType="codeTypeVo">
+		DELETE FROM CODE_TYPE
+		WHERE CODE_TYPE = #{codeType} 
+	</delete>
+	
+</mapper>

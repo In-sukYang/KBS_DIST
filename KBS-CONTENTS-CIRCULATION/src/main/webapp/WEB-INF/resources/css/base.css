@@ -1,0 +1,38 @@
+@charset "utf-8";
+/* 초기화 */
+
+
+@import url(nanumbarungothic.css);
+@import url(nanumsquare.css);
+
+
+html {overflow-y:scroll;  overflow-x:hidden;}
+body {margin:0;padding:0;font-size:0.75em; font-family: "Nanum Barun Gothic", sans-serif;}
+html, h1, h2, h3, h4, h5, h6, form, fieldset, img {margin:0;padding:0;border:0}
+h1, h2, h3, h4, h5, h6 {font-size:1em; font-family: "Nanum Barun Gothic", sans-serif;}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block}
+
+#hd ul, nav ul, #ft ul, ul {margin:0;padding:0;list-style:none}
+li {list-style:none}
+legend {position:absolute;margin:0;padding:0;font-size:0;line-height:0;text-indent:-9999em;overflow:hidden}
+label, input, button, select, img {vertical-align:middle}
+input, button {margin:0;padding:0;font-family: "Nanum Barun Gothic", sans-serif;font-size:13px; color:#555; letter-spacing:-0.025em;}
+button {cursor:pointer}
+textarea, input[type="text"] { font-size:14px;}
+input[type="radio"] { width:19px; height:19px; border:1px solid #ccc; background: #fff;}
+input { border:1px solid #ccc; }
+textarea, select {font-family: "Nanum Barun Gothic", sans-serif; border:1px solid #ccc; color: #777777;}
+select {border:1px solid #ccc; background:#fff; height:26px; }
+p {margin:0;padding:0;word-break:normal; }
+hr {display:none}
+pre {overflow-x:scroll;font-size:1.1em}
+a:link, a:visited {color:#555;text-decoration:none}
+a:hover, a:focus, a:active {color:#555;text-decoration:none; }
+
+* {padding:0px; margin:0px; line-height:100%; }
+
+em { font-style:normal;}
+
+/* 테이블 */
+table {border-collapse:collapse; width:100%;}
+caption {height:0;overflow:hidden;font-size:0;line-height:0;text-indent:-20000px;}

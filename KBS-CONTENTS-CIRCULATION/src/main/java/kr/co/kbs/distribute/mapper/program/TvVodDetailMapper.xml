@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.TvVodDetailMapper">
+	
+	<select id="selectTvVodDatailList1" parameterType="programParamVo" resultType="tvVodDetailVo">
+		<![CDATA[
+		SELECT 
+			A.BROAD_DATE,
+
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPM' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 13), 0)AS LG,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPM' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 14), 0)AS SK,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPM' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ > 50 AND C_SEQ <= 60), 0) AS CVOD,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPV' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 13), 0)AS LG_PPV,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPV' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 14), 0)AS SK_PPV,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND PRO_TYPE = 'PPV' AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ > 50 AND C_SEQ <= 60), 0) AS CVOD_PPV
+		FROM CONTENTS A
+		WHERE A.REVIEW_YN ='N'
+		AND A.P_SEQ = #{pSeq}
+		AND A.BROAD_DATE >= #{searchValue}
+		AND A.BROAD_DATE <= #{searchValue2}
+		ORDER BY BROAD_DATE
+		]]>
+	</select>
+	
+	<select id="selectTvVodDatailList2" parameterType="programParamVo" resultType="tvVodDetailVo">
+		
+		select  dt.yyyymmdd, #{broadDate} AS BROAD_DATE, 
+
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND C_SEQ = 13 AND PRO_TYPE = 'PPM' AND VIEW_DATE = dt.yyyymmdd  ), 0) LG,
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND C_SEQ = 14 AND PRO_TYPE = 'PPM' AND VIEW_DATE = dt.yyyymmdd  ), 0) SK,
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND PRO_TYPE = 'PPM' AND <![CDATA[ C_SEQ >50 AND C_SEQ <=60 ]]> AND VIEW_DATE = dt.yyyymmdd  ), 0) CVOD,
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND PRO_TYPE = 'PPV' AND C_SEQ = 13 AND VIEW_DATE = dt.yyyymmdd  ), 0) LG_PPV,
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND PRO_TYPE = 'PPV' AND C_SEQ = 14 AND VIEW_DATE = dt.yyyymmdd  ), 0) SK_PPV,
+		 	IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND PRO_TYPE = 'PPV' AND <![CDATA[ C_SEQ >50 AND C_SEQ <=60 ]]> AND VIEW_DATE = dt.yyyymmdd  ), 0) CVOD_PPV
+		from    (
+        	select
+        	    curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as yyyymmdd
+            	,a.a as aa
+                ,b.a as ba
+                ,c.a as ca
+        	from    
+        		(select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+        	) dt , (SELECT PC_SEQ FROM CONTENTS WHERE BROAD_DATE = #{broadDate} AND P_SEQ = #{pSeq} AND REVIEW_YN ='N') b
+		WHERE dt.yyyymmdd >= #{searchValue} 
+		AND <![CDATA[  dt.yyyymmdd <= #{searchValue2} ]]>
+		ORDER BY DT.YYYYMMDD
+		
+	</select>
+	
+	
+</mapper>

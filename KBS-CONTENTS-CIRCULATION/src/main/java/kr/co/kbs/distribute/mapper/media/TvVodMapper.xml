@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.media.TvVodMapper">
+	<select id="selectTvVodList" parameterType="MediaParamVo" resultType="tvVodVo">
+		SELECT 
+			BB.*,
+			SUM(CASE WHEN BB.C_SEQ = 12 THEN IFNULL(CHARGE_CNT,0) END) KT, 
+			SUM(CASE WHEN BB.C_SEQ = 13 THEN IFNULL(CHARGE_CNT,0) END) LG, 
+			SUM(CASE WHEN BB.C_SEQ = 14 THEN IFNULL(CHARGE_CNT,0) END) SK, 
+			<![CDATA[
+			SUM(CASE WHEN BB.C_SEQ > 50 AND BB.C_SEQ <60 THEN IFNULL(CHARGE_CNT,0) END) CVOD,
+			]]>
+			SUM(CHARGE_CNT) TOTAL_CHARGE
+		FROM(
+		
+			SELECT 
+				TT.PC_SEQ, TT.C_SEQ,
+			 	TT.CONTENTS_NM, TT.VODCNT, TT.P_SEQ, TT.PROGRAM_NM, IFNULL(CHANNEL_NM, '') AS CHANNEL_NM,
+				SUM(TT.CHARGE_CNT) AS CHARGE_CNT
+				<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+						,TT.BROAD_DATE
+				</if>
+			FROM (	
+			
+				SELECT 
+					A.PC_SEQ, A.C_SEQ,
+				 	C.CONTENTS_NM, C.VODCNT, B.P_SEQ, B.PROGRAM_NM, 
+					A.CHARGE_CNT,
+					(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM
+					<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+						,C.BROAD_DATE
+					</if>
+					
+				FROM USAGE_STAT_PROGRAM A , PROGRAM b, CONTENTS c 
+				WHERE A.PC_SEQ=C.PC_SEQ 
+				AND B.P_SEQ=C.P_SEQ 
+				AND A.C_SEQ != 11
+				AND A.PC_SEQ !=-1
+				AND C.REVIEW_YN = 'N'
+				<if test="searchValue !=null and searchValue !=''">
+					<if test="searchType != null and searchType !='' and searchType == '01'">
+						AND DATE_FORMAT(A.VIEW_DATE,'%Y%m') = #{searchValue} 
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '02'">
+						AND DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') = #{searchValue} 
+					</if>
+					<if test="searchType != null and searchType !='' and searchType == '03'">
+						<![CDATA[
+							AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+						]]>
+					</if>
+				</if>
+				<if test="channel != null and channel.size !=0">
+					 AND B.CHANNEL_ID IN 
+					 <foreach collection="channel" item="item" index="index" separator="," open="(" close=")">
+						#{item}
+					</foreach> 
+				</if>
+				
+				<if test="cSeq != null and cSeq.size !=0">
+					 AND A.C_SEQ IN 
+					 <foreach collection="cSeq" item="item" index="index" separator="," open="(" close=")">
+						#{item}
+					</foreach> 
+				</if>
+				
+				<if test="proType !=null and proType!=''">
+					AND A.PRO_TYPE = #{proType}
+				</if>
+			) TT
+				
+			<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 01">
+				GROUP BY TT.C_SEQ, TT.P_SEQ
+			</if>
+			<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+				GROUP BY TT.C_SEQ, TT.PC_SEQ
+			</if>
+		)BB
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 01">
+			GROUP BY BB.P_SEQ
+		</if>
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+			GROUP BY BB.PC_SEQ
+		</if>
+		ORDER BY TOTAL_CHARGE DESC
+		LIMIT 0, 20
+	</select>
+	
+	
+	
+</mapper>

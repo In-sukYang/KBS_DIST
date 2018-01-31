@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+        http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        ">
+
+    <task:scheduled-tasks scheduler="dailyScheduler">
+        <!-- 시간별 호출 -->
+         <task:scheduled ref="scheduleKbsHourCheckBean" method="requestAliveSelect" cron="00 30 05 * * *" />
+         <task:scheduled ref="schedulePooqDailyAPIBean" method="requestAliveSelect" cron="00 30 02 * * *" />
+        <task:scheduled ref="scheduleKbsDailyProgramInfoBean" method="requestAliveSelect" cron="00 00 03 * * *" />
+        <task:scheduled ref="scheduleKbsDailyProRatingBean" method="requestAliveSelect" cron="00 00 08 * * *" />
+        <!-- 
+       
+         -->
+        <!-- 일별 호출--> 
+        
+        
+        
+        
+        <!-- 
+        <task:scheduled ref="scheduleTempSKPPVBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        <task:scheduled ref="scheduleTempSKPPMBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        <task:scheduled ref="scheduleTempCVODBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000" />
+         <task:scheduled ref="scheduleTempCVODBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000" />
+        <task:scheduled ref="scheduleTempKtUseBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        <task:scheduled ref="scheduleTempKtSellBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000" />
+        <task:scheduled ref="scheduleTempCSVPPVBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        <task:scheduled ref="scheduleTempLGPPVBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        
+        <task:scheduled ref="scheduleTempSKPPMBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        <task:scheduled ref="scheduleTempSKPPVBean" method="requestAliveSelect" fixed-delay="600000000" initial-delay="11000"  />
+        
+        
+         -->
+          
+        
+        <!-- 
+        <task:scheduled ref="scheduleTempKBSOneDataBean" method="requestAliveSelect" cron="50 05 22 * * *" />
+        <task:scheduled ref="scheduleTempKBSOneDataBean" method="requestAliveSelect" cron="50 55 09 * * *" />
+        
+        <task:scheduled ref="scheduleTempKBSClipBean" method="requestAliveSelect" cron="50 55 09 * * *" />
+        <task:scheduled ref="scheduleTempRateBean" method="requestAliveSelect" cron="00 30 02 * * *" />
+        <task:scheduled ref="scheduleTempCVODBean" method="requestAliveSelect" cron="00 50 19 * * *" />
+        <task:scheduled ref="scheduleTempKtUseBean" method="requestAliveSelect" cron="00 00 20 * * *" />
+        <task:scheduled ref="scheduleTempKtSellBean" method="requestAliveSelect" cron="00 00 21 * * *" />
+        <task:scheduled ref="scheduleTempCSVPPVBean" method="requestAliveSelect" cron="00 00 22 * * *" />
+        <task:scheduled ref="scheduleTempCSVLiveBean" method="requestAliveSelect" cron="00 00 23 * * *" />
+        <task:scheduled ref="scheduleTempLGPPVBean" method="requestAliveSelect" cron="00 00 01 * * *" />
+        <task:scheduled ref="scheduleTempRateBean" method="requestAliveSelect" cron="00 30 02 * * *" />
+        
+        <task:scheduled ref="scheduleTempSKPPMBean" method="requestAliveSelect" cron="00 00 03 * * *" />
+        <task:scheduled ref="scheduleTempSKPPVBean" method="requestAliveSelect" cron="00 00 04 * * *" />
+         -->
+    </task:scheduled-tasks>
+
+    <task:scheduler id="dailyScheduler" pool-size="30" />
+    
+   	<task:executor id="executorSubmit" pool-size="50"  />
+
+</beans>

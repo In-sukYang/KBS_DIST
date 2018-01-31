@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.statusboard.PointStatusBoardMapper">
+	<select id="selectTvVodTopFiveList" parameterType="MediaParamVo" resultType="tvVodVo">
+		SELECT 
+			TT.PC_SEQ, 
+		 	TT.CONTENTS_NM, TT.VODCNT, TT.P_SEQ, TT.PROGRAM_NM, 
+			SUM(TT.CHARGE_CNT) AS CHARGE_CNT,
+			VIEW_DATE,CHANNEL_NM
+		FROM (	
+		
+			SELECT 
+				DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') AS VIEW_DATE,
+				A.PC_SEQ, A.C_SEQ,
+			 	C.CONTENTS_NM, IFNULL(C.VODCNT, '' ) AS VODCNT, B.P_SEQ, B.PROGRAM_NM, 
+			 	(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM,
+				A.CHARGE_CNT
+			FROM USAGE_STAT_PROGRAM A use index(idx_usage_stat_program_01) , PROGRAM b, CONTENTS c 
+			WHERE A.PC_SEQ=C.PC_SEQ 
+			AND B.P_SEQ=C.P_SEQ 
+			AND A.C_SEQ != 11
+			AND A.C_SEQ != 12
+			AND C.REVIEW_YN ='N'
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					<![CDATA[
+						AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+					]]>
+				</if>
+			</if>
+			AND A.PRO_TYPE = 'PPM'
+			AND A.PC_SEQ != -1
+		) TT
+		GROUP BY TT.PC_SEQ
+		ORDER BY SUM(TT.CHARGE_CNT) DESC
+		LIMIT 0, 5
+	</select>
+	
+	<select id="selectPooqVodFiveList" parameterType="mediaParamVo" resultType="pooqVodVo">
+		SELECT 
+			A.PC_SEQ, A.C_SEQ,
+			DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') AS VIEW_DATE,
+		 	C.CONTENTS_NM, IFNULL(C.VODCNT,'') AS VODCNT, B.P_SEQ, B.PROGRAM_NM, 
+		 	(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM,
+			
+			SUM(A.charge_cnt) AS CHARGE_CNT
+		FROM USAGE_STAT_PROGRAM A , PROGRAM b, CONTENTS c 
+		WHERE A.PC_SEQ=C.PC_SEQ 
+		AND B.P_SEQ=C.P_SEQ 
+		AND A.C_SEQ = 11
+		AND C.REVIEW_YN ='N'
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND A.VIEW_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND A.VIEW_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		AND A.PC_SEQ != -1
+		GROUP BY A.PC_SEQ
+		ORDER BY SUM(A.charge_cnt) DESC
+		LIMIT 0, 5		
+	</select>
+	
+	<select id="selectSmrClipTopFiveList" parameterType="mediaParamVo" resultType="smrClipVo">
+		SELECT 
+			B.PROGRAM_NM,
+			DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') AS VIEW_DATE,
+			(SELECT VODCNT FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ ) AS VODCNT,			 
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM,
+			(SELECT CONTENTS_NM FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN ='N' ) AS CONTENTS_NM,
+			CLIP_ID,CLIP_NM, SUM(VIEW_CNT) AS VIEW_CNT 
+ 		FROM CLIP A  LEFT JOIN PROGRAM B
+ 		ON A.P_SEQ = B.P_SEQ
+ 		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					<![CDATA[
+						AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+					]]>
+				</if>
+			</if>
+		</where>
+		
+		AND A.PC_SEQ != -1
+		GROUP BY A.PC_SEQ
+ 		ORDER BY VIEW_CNT DESC
+		LIMIT 0, 5
+	</select>
+	
+	<select id="selectRatingTopFiveList" parameterType="mediaParamVo" resultType="rateRankVo">
+		SELECT 
+			DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') AS BROAD_DATE,
+			(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+			A.CONTENTS_NM,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = A.CHANNEL) AS CHANNEL_NM,
+			CONTENTS_NM, IFNULL((SELECT VODCNT FROM CONTENTS WHERE CONTENTS_ID = A.CONTENTS_ID AND REVIEW_YN ='N' GROUP BY CONTENTS_ID), '') AS VODCNT,
+			IFNULL(SUM(VIEW_RATING_HOUSE),0) AS VIEW_RATING  
+		FROM DC_VIEW_RATING A
+		WHERE PC_SEQ != -1
+		AND STAT_CODE = '00'
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND A.BROAD_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND A.BROAD_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND A.BROAD_DATE >= #{searchValue} AND A.BROAD_DATE <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		GROUP BY PC_SEQ
+		ORDER BY IFNULL(SUM(VIEW_RATING_HOUSE),0) DESC
+		LIMIT 0, 5
+	</select>
+	
+	<select id="selectPooqLiveTopFiveList" parameterType="mediaParamVo" resultType="rateRankVo">
+		SELECT 
+			DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') AS BROAD_DATE,
+			(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+			A.CONTENTS_NM,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = A.CHANNEL) AS CHANNEL_NM,
+			CONTENTS_NM, IFNULL((SELECT VODCNT FROM CONTENTS WHERE CONTENTS_ID = A.CONTENTS_ID AND REVIEW_YN ='N' GROUP BY CONTENTS_ID),'') AS VODCNT,
+			IFNULL(SUM(POOQ_VIEWCNT),0) AS VIEW_RATING  
+		FROM DC_VIEW_RATING A
+		WHERE PC_SEQ != -1
+		AND STAT_CODE = '00'
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND A.BROAD_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND A.BROAD_DATE = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND A.BROAD_DATE >= #{searchValue} AND A.BROAD_DATE <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		GROUP BY PC_SEQ
+		ORDER BY IFNULL(SUM(POOQ_VIEWCNT),0) DESC
+		LIMIT 0, 5
+	</select>
+	
+</mapper>

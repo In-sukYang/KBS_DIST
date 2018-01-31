@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.ProgramExpMapper">
+	<select id="selectProgramExpList" parameterType="programParamVo" resultType="programExpVo" >
+		SELECT
+			PE_SEQ, P_SEQ, EXP_PROGRAM_NM, INPUT_ID, INPUT_DT, 
+			UPDATE_ID, UPDATE_DT
+		FROM PROGRAM_EXP
+		<where>
+			<if test="peSeq !=null and peSeq !=0">
+				AND PE_SEQ = #{peSeq}
+			</if>
+			
+			<if test="pSeq !=null and pSeq !=0">
+				AND P_SEQ = #{pSeq}
+			</if>
+		</where> 
+		ORDER BY PE_SEQ
+	</select>
+	
+	<insert id="insertProgramExp" parameterType="ProgramExpVo">
+		INSERT INTO PROGRAM_EXP(
+			P_SEQ, 
+			EXP_PROGRAM_NM, 
+			INPUT_ID, 
+			INPUT_DT
+		)VALUES(
+			#{pSeq}, 
+			#{expProgramNm}, 
+			#{loginUser},
+			NOW()
+		)
+	</insert>
+	
+	<delete id="deleteProgramExp" parameterType="programParamVo">
+		DELETE FROM PROGRAM_EXP
+		WHERE PE_SEQ IN
+		<foreach collection="peSeqList" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>
+

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.UsageStatChannelMapper">
+	
+	<select id="selectUsageStatChannelList" parameterType="programParamVo" resultType="usageStatChannelVo">
+		SELECT 
+			A.usc_seq, A.c_seq, A.tg_seq, A.channel, DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') AS BROAD_DATE, 
+			A.sex_gubun, A.age0_vcnt, A.age20_vcnt, A.age30_vcnt, A.age40_vcnt, 
+			A.age50_vcnt, A.input_id, A.input_dt, A.update_id, A.update_dt,
+			B.c_nm,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = A.CHANNEL)	CHANNEL_NM,
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 09 AND CODE_ID = A.sex_gubun) sex
+		FROM usage_stat_channel A, company B 
+		WHERE A.C_SEQ = B.C_SEQ
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND DATE_FORMAT(A.BROAD_DATE,'%Y%m') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') >= #{searchValue} AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		<if test='channel != null and channel.size !=0'>
+			 AND A.CHANNEL IN 
+			 <foreach collection="channel" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach> 
+		</if>
+		
+		<if test='sexGubun != null and sexGubun.size !=0'>
+			 AND A.sex_gubun IN 
+			 <foreach collection="sexGubun" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach> 
+		</if>
+		ORDER BY USC_SEQ
+		LIMIT #{offset}, #{noOfRecords}
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int">
+       SELECT 
+			count(*)
+		FROM usage_stat_channel A, company B 
+		WHERE A.C_SEQ = B.C_SEQ
+		<if test="searchValue !=null and searchValue !=''">
+			<if test="searchType != null and searchType !='' and searchType == '01'">
+				AND DATE_FORMAT(A.BROAD_DATE,'%Y%m') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '02'">
+				AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') = #{searchValue} 
+			</if>
+			<if test="searchType != null and searchType !='' and searchType == '03'">
+				<![CDATA[
+					AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') >= #{searchValue} AND DATE_FORMAT(A.BROAD_DATE,'%Y%m%d') <= #{searchValue2}
+				]]>
+			</if>
+		</if>
+		<if test='channel != null and channel.size !=0'>
+			 AND A.CHANNEL IN 
+			 <foreach collection="channel" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach> 
+		</if>
+		
+		<if test='sexGubun != null and sexGubun.size !=0'>
+			 AND A.sex_gubun IN 
+			 <foreach collection="sexGubun" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach> 
+		</if>
+    </select>
+	
+	<insert id="insertUsageStatChannel" parameterType="usageStatChannelVo">
+		INSERT INTO usage_stat_channel(
+			c_seq, 
+			tg_seq, 
+			channel, 
+			broad_date, 
+			sex_gubun, 
+			age0_vcnt, 
+			age20_vcnt, 
+			age30_vcnt, 
+			age40_vcnt, 
+			age50_vcnt, 
+			input_id, 
+			input_dt)
+		VALUES (
+			#{cSeq}, 
+			#{tgSeq}, 
+			#{channel}, 
+			#{broadDate}, 
+			#{sexGubun}, 
+			#{age0Vcnt}, 
+			#{age20Vcnt}, 
+			#{age30Vcnt}, 
+			#{age40Vcnt}, 
+			#{age50Vcnt}, 
+			#{loginUser}, 
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateUsageStatChannel" parameterType="usageStatChannelVo">
+		UPDATE usage_stat_channel
+			<set>
+				<if test="cSeq != null and cSeq !=0 ">C_SEQ=#{cSeq}, </if>
+				<if test="tgSeq != null and tgSeq != 0 ">TG_SEQ=#{tgSeq}, </if>
+				<if test="channel != null and channel !='' ">CHANNEL=#{channel}, </if>
+				<if test="broadDate != null and broadDate !='' ">BROAD_DATE=#{broadDate}, </if>
+				<if test="sexGubun != null and sexGubun !='' ">SEX_GUBUN=#{sexGubun}, </if>
+				<if test="age0Vcnt != null and age0Vcnt !=0 ">AGE0_VCNT=#{age0Vcnt}, </if>
+				<if test="age20Vcnt != null and age20Vcnt !=0 ">AGE20_VCNT=#{age20Vcnt}, </if>
+				<if test="age30Vcnt != null and age30Vcnt !=0 ">AGE30_VCNT=#{age30Vcnt}, </if>
+				<if test="age40Vcnt != null and age40Vcnt !=0 ">AGE40_VCNT=#{age40Vcnt}, </if>
+				<if test="age50Vcnt != null and age50Vcnt !=0 ">AGE50_VCNT=#{age50Vcnt}, </if>
+			
+				UPDATE_ID=#{loginUser},
+				UPDATE_DT=NOW()
+			</set>
+		WHERE USC_SEQ=#{uscSeq}
+	</update>
+	
+	<select id="selectUspKey" parameterType="usageStatChannelVo" resultType="Integer">
+		SELECT 
+			USC_SEQ
+		FROM USAGE_STAT_CHANNEL
+		WHERE C_SEQ = #{cSeq}
+		AND CHANNEL = #{channel}
+		AND BROAD_DATE = #{broadDate} 
+		AND SEX_GUBUN = #{sexGubun}
+	
+	
+	</select>
+	
+	
+</mapper>

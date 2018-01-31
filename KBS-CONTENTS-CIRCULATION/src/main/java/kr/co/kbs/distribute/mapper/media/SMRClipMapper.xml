@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.media.SMRClipMapper">
+	<select id="selectSmrClipTopList" parameterType="mediaParamVo" resultType="smrClipVo">
+		SELECT 
+			B.PROGRAM_NM, 
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = 18 AND CODE_ID = B.CHANNEL_ID) AS CHANNEL_NM,
+			(SELECT CONTENTS_NM FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN= 'N') AS CONTENTS_NM,
+			IFNULL((SELECT VODCNT FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ AND REVIEW_YN= 'N'), '') AS VODCNT,
+			CLIP_ID,CLIP_NM, SUM(VIEW_CNT) AS VIEW_CNT , VIEW_DATE
+ 		FROM CLIP A  LEFT JOIN PROGRAM B
+ 		ON A.P_SEQ = B.P_SEQ
+ 		
+ 		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND DATE_FORMAT(A.VIEW_DATE,'%Y%m') = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND DATE_FORMAT(A.VIEW_DATE,'%Y%m%d') = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					<![CDATA[
+						AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+					]]>
+				</if>
+			</if>
+			<if test="channel != null and channel.size !=0">
+				 AND B.CHANNEL_ID IN 
+				 <foreach collection="channel" item="item" index="index" separator="," open="(" close=")">
+					#{item}
+				</foreach> 
+			</if>
+		</where>
+		
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 01">
+			AND A.P_SEQ != -1
+			GROUP BY A.P_SEQ
+		</if>
+		<if test="programSummaryType !=null and programSummaryType !='' and programSummaryType == 02">
+			AND A.PC_SEQ != -1
+			GROUP BY A.PC_SEQ
+		</if>
+		
+ 		ORDER BY SUM(VIEW_CNT) DESC
+		LIMIT 0, 20
+	</select>
+	
+	
+	
+</mapper>

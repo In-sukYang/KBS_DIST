@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.pairing.PairingInformationMapper">
+
+	<select id="selectPairingInformationList" parameterType="pairingParamVo" resultType="pairinVo">
+		SELECT
+			DATE_FORMAT(A.BROAD_DATE, '%Y%m%d') AS BROAD_DATE,
+			CONCAT(DATE_FORMAT(A.BROAD_STDT, '%H:%i'), '~', DATE_FORMAT(A.BROAD_EDDT, '%H:%i')) AS BROAD_TIME,
+			A.VIEW_RATING,
+			IFNULL((SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ), '미 매핑자료') AS PROGRAM_NM,
+			IFNULL((SELECT VODCNT FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ), '미 매핑자료') AS VODCNT,
+			(SELECT  COALESCE(SUM(charge_cnt),0) + COALESCE(SUM(h_charge_cnt),0) + 
+				COALESCE(SUM(free_charge_cnt),0) + COALESCE(SUM(H_free_charge_cnt),0)
+			 	FROM USAGE_STAT_PROGRAM WHERE C_SEQ =11 AND PC_SEQ = A.PC_SEQ
+			 	<![CDATA[ 
+				AND DATE_FORMAT(VIEW_DATE, '%Y%m%d') <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL +  #{addDay} DAY ), '%Y%m%d')
+				]]>
+			) AS POOQ_VOD,
+			(SELECT  COALESCE(SUM(charge_cnt),0) + COALESCE(SUM(h_charge_cnt),0) + 
+				COALESCE(SUM(free_charge_cnt),0) + COALESCE(SUM(H_free_charge_cnt),0)
+			 	FROM USAGE_STAT_PROGRAM WHERE C_SEQ !=11 AND PC_SEQ = A.PC_SEQ
+			 	<![CDATA[ 
+				AND DATE_FORMAT(VIEW_DATE, '%Y%m%d') <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y%m%d')
+				]]>
+			) AS TV_VOD,
+			(SELECT COALESCE(SUM(VIEW_CNT),0) FROM CLIP WHERE PC_SEQ = A.PC_SEQ 
+				<![CDATA[			
+				AND DATE_FORMAT(VIEW_DATE, '%Y%m%d') <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y%m%d')
+				]]>
+			) AS clip_cnt,
+			  (SELECT COALESCE(SUM(age0_vcnt)+SUM(age20_vcnt)+SUM(age30_vcnt)+SUM(age40_vcnt)+SUM(age0_vcnt)+SUM(age50_vcnt),0)/count(*) 
+			     FROM UsAGE_STAT_CHANNEL 
+			     WHERE <![CDATA[ BROAD_DATE>A.BROAD_STDT AND BROAD_DATE<A.BROAD_EDDT ]]>AND CHANNEL=A.CHANNEL ) AS pooq_vcnt
+		FROM DC_VIEW_RATING A
+		WHERE A.STAT_CODE = '00'
+		AND DATE_FORMAT(A.BROAD_DATE, '%Y%m%d') = #{searchValue}
+		AND A.CHANNEL = #{channel}
+	</select>
+
+</mapper>

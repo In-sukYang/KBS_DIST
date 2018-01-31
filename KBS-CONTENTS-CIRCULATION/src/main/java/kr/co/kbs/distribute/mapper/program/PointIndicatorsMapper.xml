@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.PointIndicatorsMapper">
+	
+	<select id="selectProgramPointIndicatorsList" parameterType="programParamVo" resultType="pointIndicatorsVo">
+		SELECT 
+			BROAD_DATE, VODCNT, CONTENTS_ID,PC_SEQ,
+			(SELECT VIEW_RATING FROM DC_VIEW_RATING WHERE PC_SEQ = A.PC_SEQ AND STAT_CODE ='00') VIEW_RATING,
+			(SELECT sum(age0_vcnt)+sum(age20_vcnt)+sum(age30_vcnt)+sum(age40_vcnt)+sum(age50_vcnt) FROM USAGE_STAT_CHANNEL WHERE BROAD_DATE = DATE_FORMAT(A.BROAD_DATE,  '%Y-%m-%d')) POOQ_LIVE, 
+			<![CDATA[ 
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =A.PC_SEQ AND C_SEQ != 11  AND C_SEQ !=12 AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL +  #{addDay} DAY ), '%Y-%m-%d')  ), 0) TV_VOD,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =A.PC_SEQ AND C_SEQ = 11 AND C_SEQ !=12 AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL +  #{addDay} DAY ), '%Y-%m-%d')), 0) POOQ_VOD,
+			IFNULL((SELECT SUM(VIEW_CNT) FROM CLIP WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL +  #{addDay} DAY ), '%Y-%m-%d')), 0) CLIP_CNT
+			]]>
+		FROM CONTENTS A
+		WHERE A.P_SEQ = #{pSeq}
+		<![CDATA[ 
+		AND A.BROAD_DATE >= #{searchValue}
+		AND A.BROAD_DATE <= #{searchValue2}
+		]]>
+		AND REVIEW_YN = 'N'
+		ORDER BY A.BROAD_DATE, A.VODCNT
+	</select>
+	
+	
+	<select id="selectProgramPointIndicatorsList2" parameterType="programParamVo" resultType="pointIndicatorsVo">
+		select  dt.yyyymmdd, #{broadDate} AS BROAD_DATE, 
+			(SELECT VIEW_RATING FROM DC_VIEW_RATING WHERE PC_SEQ = B.PC_SEQ AND STAT_CODE ='00') VIEW_RATING,
+ 			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND C_SEQ != 11 AND C_SEQ !=12 AND VIEW_DATE = dt.yyyymmdd  ), 0) TV_VOD,
+ 			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM WHERE PC_SEQ =B.PC_SEQ AND C_SEQ = 11 AND C_SEQ !=12 AND VIEW_DATE = dt.yyyymmdd), 0) POOQ_VOD,
+ 			IFNULL( (SELECT SUM(VIEW_CNT) FROM CLIP WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd  ), 0) CLIP_CNT
+		from    (
+        	select
+        	    curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as yyyymmdd
+            	,a.a as aa
+                ,b.a as ba
+                ,c.a as ca
+        	from    
+        		(select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+        	) dt , (SELECT PC_SEQ FROM CONTENTS WHERE BROAD_DATE = #{broadDate} AND P_SEQ = #{pSeq} AND REVIEW_YN ='N') b
+		WHERE dt.yyyymmdd >= #{searchValue} 
+		AND <![CDATA[  dt.yyyymmdd <= #{searchValue2} ]]>
+		ORDER BY DT.YYYYMMDD
+	</select>
+	
+	
+</mapper>

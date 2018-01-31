@@ -1,0 +1,1181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.kbs.distribute.mapper.schedule.ScheduleDataMapper">
+
+	<insert id="insertCom" parameterType ="kr.co.kbs.distribute.company.vo.CompanyVo" >
+		INSERT INTO company ( c_nm ,c_type , use_yn)
+		values (#{cNm},#{cType},'Y')
+	</insert>
+		
+	<select id="selectCom" parameterType ="kr.co.kbs.distribute.company.vo.CompanyVo"  resultType="java.lang.Integer">
+		select count(*) cnt FROM company 
+		WHERE c_nm = #{cNm}
+	</select>
+		
+	<update id="updateCom" parameterType ="kr.co.kbs.distribute.company.vo.CompanyVo" >
+		UPDATE company 
+		SET  c_type = #{cType} , 
+			  use_yn ='Y'
+		WHERE c_nm = #{cNm}
+	</update>
+	
+	<select id="selectProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.ProgramVo"  resultType="java.lang.Integer">
+		select count(*) cnt from program 
+		WHERE program_id =#{programId}
+	</select>
+	
+	<update id="updateProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.ProgramVo" >
+		update program 
+		set program_nm =#{programNm}
+			  <if test = "broadNm != null and broadNm != ''">
+			 ,broad_id = (SELECT code_id from code where code_type='12' and code_nm=#{broadNm})
+			 </if>
+			  <if test = "channelNm != null and channelNm != ''">
+			 ,channel_id = (SELECT IFNULL(code_id,'99') from code where code_type='18' and code_nm=#{channelNm} UNION  SELECT '99' LIMIT 1)
+			 </if>
+			  <if test = "weekday != null and weekday != ''">
+			, weekday= #{weekday}
+			 </if>
+			 <if test = "oProgramId != null and oProgramId != ''">
+				,op_seq = (select op_seq from org_program where  o_program_id= #{oProgramId})
+			</if>
+			<if test = "reviewYn != null and reviewYn != ''">
+				,review_yn =#{reviewYn}
+			</if>
+			<if test = "programType != null and programType != ''">
+				,program_type=#{programType}
+			</if>
+		WHERE program_id =#{programId}
+	</update>
+	
+	<insert id="insertProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.ProgramVo" >
+		INSERT INTO program ( c_seq ,program_id , program_nm,broad_id,channel_id,weekday,
+		<if test = "oProgramId != null and oProgramId != ''">
+			op_seq,
+		</if>
+		<if test = "reviewYn != null and reviewYn != ''">
+			review_yn,
+		</if>
+		<if test = "programType != null and programType != ''">
+			program_type,
+		</if>
+		input_id)
+		values ((SELECT c_seq FROM company where c_nm=#{channelNm} and c_type='S'),#{programId},#{programNm},
+		(SELECT code_id from code where code_type='12' and code_nm=#{broadNm}),
+		(SELECT IFNULL(code_id,'99') from code where code_type='18' and code_nm=#{channelNm} UNION  SELECT '99' LIMIT 1),#{weekday},
+		<if test = "oProgramId != null and oProgramId != ''">
+			(select op_seq from org_program where  o_program_id= #{oProgramId}),
+		</if>
+		<if test = "reviewYn != null and reviewYn != ''">
+			#{reviewYn},
+		</if>
+		<if test = "programType != null and programType != ''">
+			#{programType},
+		</if>
+		'admin')
+	</insert>
+	
+	<select id="selectContents" parameterType ="kr.co.kbs.distribute.schedule.vo.ContentsVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  contents
+		WHERE contents_id = #{contentsId} and corner_id = #{cornerId}
+	</select>
+	
+	<update id="updateContents" parameterType ="kr.co.kbs.distribute.schedule.vo.ContentsVo" >
+		update contents 
+		set  contents_nm =#{contentsNm}, 
+		<if test = "vodcnt != null and vodcnt != ''">
+			vodcnt=#{vodcnt} , 
+		</if>
+		weekday=#{weekday}, 
+		contents_type = #{contentsType}, 
+		broad_date =STR_TO_DATE(#{broadDate},'%Y-%m-%d'),
+		<if test = "broadStdt != null and broadStdt != '' and broadEddt != null and broadEddt != '' ">
+			broad_stdt = ADDTIME(substring(#{broadStdt},1,8)+'000000',substring(#{broadStdt},9,14)),
+			broad_eddt = ADDTIME(substring(#{broadEddt},1,8)+'000000',substring(#{broadEddt},9,14)),
+		</if>
+		<if test = "oProgramId != null and oProgramId != ''">
+			op_seq = (select op_seq from org_program where  o_program_id= #{oProgramId}),
+		</if>
+		<if test = "reviewYn != null and reviewYn != ''">
+			review_yn =#{reviewYn},
+		</if>
+		input_id ='admin'
+		WHERE contents_id = #{contentsId} and corner_id = #{cornerId}
+	</update>
+	
+	<insert id="insertContents" parameterType ="kr.co.kbs.distribute.schedule.vo.ContentsVo" >
+		INSERT INTO contents ( p_seq ,contents_id , contents_nm,vodcnt,weekday,corner_id,contents_type,broad_date,
+		<if test = "broadStdt != null and broadStdt != '' and broadEddt != null and broadEddt != '' ">
+			broad_stdt,broad_eddt,
+			</if>
+		<if test = "oProgramId != null and oProgramId != ''">
+			op_seq,
+		</if>
+		<if test = "reviewYn != null and reviewYn != ''">
+			review_yn,
+		</if>
+		input_id)
+		values ((SELECT p_seq FROM program where program_id=#{programId}),#{contentsId},#{contentsNm},#{vodcnt},#{weekday},
+		#{cornerId},#{contentsType},STR_TO_DATE(#{broadDate},'%Y-%m-%d'),
+		<if test = "broadStdt != null and broadStdt != '' and broadEddt != null and broadEddt != '' ">
+			ADDTIME(substring(#{broadStdt},1,8)+'000000',substring(#{broadStdt},9,14))
+			,ADDTIME(substring(#{broadEddt},1,8)+'000000',substring(#{broadEddt},9,14)),
+			</if>
+			<if test = "oProgramId != null and oProgramId != ''">
+				(select op_seq from org_program where  o_program_id= #{oProgramId}),
+		</if>
+		<if test = "reviewYn != null and reviewYn != ''">
+			#{reviewYn},
+		</if>
+		'admin')
+	</insert>
+	
+	
+	<select id="selectOrgProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo"   resultType="java.lang.Integer">
+		SELECT count(*) cnt FROM  org_program 
+		WHERE o_program_id= #{oProgramId}
+	</select>
+	
+	<update id="updateOrgProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo" >
+		UPDATE org_program 
+		SET o_program_nm= #{oProgramNm},
+			  channel_id= (SELECT code_id from code where code_type='18' and code_nm=#{channelNm}),
+			  weekday= #{weekday},program_type = #{programType}
+		WHERE  o_program_id =#{oProgramId}
+	</update>
+	
+	<insert id="insertOrgProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo" >
+		INSERT INTO org_program ( o_program_id , o_program_nm,channel_id,weekday,program_type)
+		values (#{oProgramId},#{oProgramNm},
+		(SELECT code_id from code where code_type='18' and code_nm=#{channelNm}),
+		#{weekday},#{programType})
+	</insert>
+	
+	<update id="updateProgramByKBSAPI" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo">
+		UPDATE program 
+			SET op_seq = (SELECT B.op_seq FROM org_program B WHERE B.o_program_id = #{oProgramId}), parent_p_seq=-1
+		 WHERE p_seq in (SELECT * FROM (SELECT A.p_seq FROM program A WHERE A.program_id like '%${oProgramId}%') TEMP_TABLE);
+	</update>
+	
+	<select id="selectCode" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo"   resultType="java.lang.Integer">
+		select count(*) from code 
+		WHERE code_type ='07' AND code_id = #{programType}
+	</select>
+	
+	<update id="updateCode" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo" >
+		update code
+		set code_nm = #{programTypeNm}
+		WHERE code_type = '07' and code_id =#{programType}
+	</update>
+	
+	<insert id="insertCode" parameterType ="kr.co.kbs.distribute.schedule.vo.OrgProgramVo" >
+		INSERT INTO code ( code_type , code_id,code_nm)
+		values ('07',#{programType},#{programTypeNm})
+	</insert>
+	
+	<select id="selectDcViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.DcViewRatingVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  dc_view_rating
+		WHERE contents_id = #{contentsId} and stat_code=#{statCode}
+	</select>
+	
+	<update id="updateDcViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.DcViewRatingVo" >
+		update dc_view_rating 
+		set  
+		contents_nm = #{contentsNm} ,
+		p_seq = (select p_seq from contents where contents_id=#{contentsId} and review_yn='N' limit 1),
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq= #{tgSeq} ,
+		</if>
+		<if test = "viewRatingAge != null and viewRatingAge != ''">
+			view_rating_age= #{viewRatingAge} ,
+		</if>
+		<if test = "viewRatingHouse != null and viewRatingHouse != ''">
+			view_rating_house= #{viewRatingHouse} ,
+		</if>
+		<if test = "pooqViewCnt != null and pooqViewCnt != ''">
+			pooq_view_cnt= #{pooqViewCnt} ,
+		</if>
+		<if test = "searchOrg != null and searchOrg != ''">
+			search_org= #{searchOrg} ,
+		</if>
+		<if test = "viewRating != null and viewRating != ''">
+			view_rating= #{viewRating} ,
+		</if>
+		<if test = "viewShare != null and viewShare != ''">
+			view_share= #{viewShare} ,
+		</if>
+		broad_eddt =ADDTIME(substring(#{broadEddt},1,8)+'000000',substring(#{broadEddt},9,14)),
+		stat_code=#{statCode}
+		WHERE contents_id = #{contentsId} and stat_code=#{statCode}
+	</update>
+	
+	<insert id="insertDcViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.DcViewRatingVo" >
+		INSERT INTO dc_view_rating ( 
+		 contents_id ,contents_nm, broad_date,channel,
+		 p_seq,
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq,
+		</if>
+		<if test = "viewRatingAge != null and viewRatingAge != ''">
+			view_rating_age,
+		</if>
+		<if test = "viewRatingHouse != null and viewRatingHouse != ''">
+			view_rating_house,
+		</if>
+		<if test = "pooqViewCnt != null and pooqViewCnt != ''">
+			pooq_view_cnt,
+		</if>
+		<if test = "searchOrg != null and searchOrg != ''">
+			search_org,
+		</if>
+		<if test = "viewRating != null and viewRating != ''">
+			view_rating,
+		</if>
+		<if test = "viewShare != null and viewShare != ''">
+			view_share,
+		</if>
+		broad_stdt,broad_eddt,stat_code
+		)
+		values (#{contentsId},#{contentsNm},ADDTIME(substring(#{broadDate},1,8)+'000000',substring(#{broadDate},9,14)),#{channel},
+		(select p_seq from contents where contents_id=#{contentsId} limit 1),
+		<if test = "tgSeq != null and tgSeq != ''">
+			#{tgSeq},
+		</if>
+		<if test = "viewRatingAge != null and viewRatingAge != ''">
+			#{viewRatingAge},
+		</if>
+		<if test = "viewRatingHouse != null and viewRatingHouse != ''">
+			#{viewRatingHouse},
+		</if>
+		<if test = "pooqViewCnt != null and pooqViewCnt != ''">
+			#{pooqViewCnt},
+		</if>
+		<if test = "searchOrg != null and searchOrg != ''">
+			#{searchOrg},
+		</if>
+		<if test = "viewRating != null and viewRating != ''">
+			#{viewRating},
+		</if>
+		<if test = "viewShare != null and viewShare != ''">
+			#{viewShare},
+		</if>
+		<if test = "broadStdt != null and broadStdt != '' and broadEddt != null and broadEddt != '' ">
+			ADDTIME(substring(#{broadStdt},1,8)+'000000',substring(#{broadStdt},9,14))
+			,ADDTIME(substring(#{broadEddt},1,8)+'000000',substring(#{broadEddt},9,14))
+		</if>
+		,#{statCode}
+		)
+	</insert>
+	
+	
+	<select id="selectGetContentsId" parameterType ="kr.co.kbs.distribute.schedule.vo.DataVo"   resultType="kr.co.kbs.distribute.schedule.vo.DataVo">
+
+		SELECT DISTINCT b.pc_seq as pc_seq ,IFNULL(a.parent_p_seq, a.p_seq) as p_seq FROM PROGRAM a left join PROGRAM_EXP c on IFNULL(a.parent_p_seq, a.p_seq)=c.p_seq , CONTENTS b
+		WHERE 
+		a.p_seq=b.p_seq
+		AND (
+			 (
+			 REGEXP_REPLACE(a.PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','') =
+			 REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','')
+			) OR (
+			 REGEXP_REPLACE(c.exp_PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','') =
+			 REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','')
+			)
+		)
+		AND (
+				b.vodcnt=REGEXP_REPLACE(#{vodcnt},'회','') OR b.broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d') OR b.broad_date = STR_TO_DATE(#{broadDate},'%y%m%d')
+		)
+		and b.review_yn='N'
+		ORDER BY b.corner_Id ASC
+		limit 1
+	</select>
+	
+	<select id="selectGetContentsIdList" parameterType ="kr.co.kbs.distribute.schedule.vo.DataVo"   resultType="kr.co.kbs.distribute.schedule.vo.DataVo">
+		SELECT 
+			DISTINCT b.pc_seq as pc_seq ,IFNULL(a.parent_p_seq, a.p_seq) as p_seq,
+			a.op_seq,  a.channel_id
+		
+		FROM PROGRAM a left join PROGRAM_EXP c 
+		on IFNULL(a.parent_p_seq, a.p_seq)=c.p_seq , CONTENTS b
+		WHERE 
+		a.p_seq=b.p_seq
+		AND (
+			 (
+			 REGEXP_REPLACE(a.PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','') =
+			 REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','')
+			) OR (
+			 REGEXP_REPLACE(c.exp_PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','') =
+			 REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-//!]|HD','')
+			)
+		)
+		AND (
+				b.vodcnt=REGEXP_REPLACE(#{vodcnt},'회','') 
+				OR b.broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d') 
+				OR b.broad_date = STR_TO_DATE(#{broadDate},'%y%m%d')
+		)
+		and b.review_yn='N'
+		ORDER BY b.corner_Id ASC
+		
+	</select>
+	
+	
+	<select id="selectGetProgramId" parameterType ="kr.co.kbs.distribute.schedule.vo.DataVo"   resultType="String">
+		SELECT IFNULL(a.parent_p_seq, a.p_seq) FROM PROGRAM a left join PROGRAM_EXP b on IFNULL(a.parent_p_seq, a.p_seq)=b.p_seq 
+		 left join ORG_PROGRAM c on REGEXP_REPLACE(a.PROGRAM_ID,'K01_|K_02','')=c.o_program_id 
+		 and a.channel_id=c.channel_id
+		WHERE 
+		(
+			REGEXP_REPLACE(a.PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-]','') =
+			REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-]','')
+		) OR (
+			REGEXP_REPLACE(b.exp_PROGRAM_NM,'\\s|\\([가-힣1-9]{1,}\\)|[,-]','') =
+			REGEXP_REPLACE(#{programNm},'\\s|\\([가-힣1-9]{1,}\\)|[,-]','')
+		)
+		limit 1
+	</select>
+	<!-- 
+	<select id="selectGetContentsIdInfo" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo"   resultType="kr.co.kbs.distribute.schedule.vo.UseStatProVo">
+		SELECT b.pc_seq as pc_seq ,IFNULL(a.parent_p_seq, a.p_seq) as p_seq FROM PROGRAM a, CONTENTS b
+		WHERE 
+		a.p_seq=b.p_seq
+		AND b.contents_id=#{contentsId} AND  a.program_nm=#{programNm}
+	</select>
+	 -->
+	<select id="selectGetContentsIdInfo" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo"   resultType="kr.co.kbs.distribute.schedule.vo.UseStatProVo">
+		select 
+			b.pc_seq as pc_seq ,IFNULL(a.parent_p_seq, a.p_seq) as p_seq,
+			a.op_seq,  a.channel_id 
+		from program a ,contents b 
+		where a.p_seq=b.p_seq and b.contents_id=#{contentsId} limit 1
+	</select>
+	
+	<select id="selectGetContentsIdInfoList" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo"   resultType="kr.co.kbs.distribute.schedule.vo.UseStatProVo">
+		select 
+			b.pc_seq as pc_seq ,IFNULL(a.parent_p_seq, a.p_seq) as p_seq, 
+			a.op_seq,  a.channel_id	
+		from program a ,contents b 
+		where a.p_seq=b.p_seq and b.contents_id=#{contentsId}
+	</select>
+	
+	
+	
+	<select id="selectUseStatProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  usage_stat_program
+		WHERE pc_seq = #{pcSeq} AND c_seq =(SELECT c_seq FROM company where c_nm=#{comNm} and c_type='P') 
+		AND view_date = STR_TO_DATE(#{viewDate},'%Y%m%d') AND pro_type = #{proType}
+	</select>
+	
+	
+	<select id="selectUseStatProgramSub" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  usage_stat_program
+		WHERE pc_seq = #{pcSeq} AND c_seq =(SELECT c_seq FROM company where c_nm=#{comNm} and c_type='P') 
+		AND view_date = STR_TO_DATE(#{viewDate},'%Y%m%d') AND pro_type = #{proType}
+		<if test = "tempData != null and tempData != ''">
+			AND	temp_data= #{tempData}
+		</if>
+	</select>
+	
+	<update id="updateUseStatProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo" >
+		update usage_stat_program 
+		set  
+		<if test = "pSeq != null and pSeq != ''">
+			op_seq= (SELECT op_seq FROM PROGRAM WHERE p_seq=#{pSeq} ),
+		</if>
+		<if test = "tgSeq != null and tgSeq != ''">
+			view_rating_age= #{tgSeq} ,
+		</if>
+		<if test = "proType != null and proType != ''">
+			pro_type= #{proType} ,
+		</if>
+		<if test = "screenType != null and screenType != ''">
+			screen_type= #{screenType} ,
+		</if>
+		<if test = "chargeYn != null and chargeYn != ''">
+			charge_yn= #{chargeYn} ,
+		</if>
+		<if test = "amount != null and amount != ''">
+			amount= #{amount} ,
+		</if>
+		<if test = "totalAmount != null and totalAmount != ''">
+			total_amount= #{totalAmount} ,
+		</if>
+		<if test = "chargeCnt != null and chargeCnt != ''">
+			charge_cnt= #{chargeCnt} ,
+		</if>
+		<if test = "hChargeCnt != null and hChargeCnt != ''">
+			h_charge_cnt= #{hChargeCnt} ,
+		</if>
+		<if test = "freeChargeCnt != null and freeChargeCnt != ''">
+			free_charge_cnt= #{freeChargeCnt} ,
+		</if>
+		<if test = "hFreeChargeCnt != null and hFreeChargeCnt != ''">
+			h_free_charge_cnt= #{hFreeChargeCnt} ,
+		</if>
+		<if test = "chargeVtime != null and chargeVtime != ''">
+			charge_vtime= #{chargeVtime} ,
+		</if>
+		<if test = "hChargeVtime != null and hChargeVtime != ''">
+			h_charge_vtime= #{hChargeVtime} ,
+		</if>
+		<if test = "freeChargeVtime != null and freeChargeVtime != ''">
+			free_charge_vtime= #{freeChargeVtime} ,
+		</if>
+		<if test = "hFreeChargeVtime != null and hFreeChargeVtime != ''">
+			h_free_charge_vtime= #{hFreeChargeVtime} ,
+		</if>
+		<if test = "joinCnt != null and joinCnt != ''">
+			join_cnt= #{joinCnt},
+		</if>
+		<if test = "channelId != null and channelId != ''">
+			channel_id = #{channelId},
+		</if>
+		<if test = "viewDate != null and viewDate != ''">
+			view_date= STR_TO_DATE(#{viewDate},'%Y%m%d') ,
+		</if>
+		<if test = "tempData != null and tempData != ''">
+			temp_data= #{tempData},
+		</if>
+		update_dt =NOW()
+		WHERE pc_seq = #{pcSeq} AND c_seq =(SELECT c_seq FROM company where c_nm=#{comNm} and c_type='P') 
+		AND view_date = STR_TO_DATE(#{viewDate},'%Y%m%d') AND pro_type = #{proType}
+	</update>
+	
+	<insert id="insertUseStatProgram" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatProVo" >
+		INSERT INTO usage_stat_program ( 
+		 <if test = "pSeq != null and pSeq != ''">
+			op_seq,
+		</if>
+		<if test = "tgSeq != null and tgSeq != ''">
+			view_rating_age,
+		</if>
+		<if test = "screenType != null and screenType != ''">
+			screen_type,
+		</if>
+		<if test = "chargeYn != null and chargeYn != ''">
+			charge_yn,
+		</if>
+		<if test = "amount != null and amount != ''">
+			amount,
+		</if>
+		<if test = "totalAmount != null and totalAmount != ''">
+			total_amount,
+		</if>
+		<if test = "chargeCnt != null and chargeCnt != ''">
+			charge_cnt ,
+		</if>
+		<if test = "hChargeCnt != null and hChargeCnt != ''">
+			h_charge_cnt ,
+		</if>
+		<if test = "freeChargeCnt != null and freeChargeCnt != ''">
+			free_charge_cnt ,
+		</if>
+		<if test = "hFreeChargeCnt != null and hFreeChargeCnt != ''">
+			h_free_charge_cnt ,
+		</if>
+		<if test = "chargeVtime != null and chargeVtime != ''">
+			charge_vtime ,
+		</if>
+		<if test = "hChargeVtime != null and hChargeVtime != ''">
+			h_charge_vtime,
+		</if>
+		<if test = "freeChargeVtime != null and freeChargeVtime != ''">
+			free_charge_vtime ,
+		</if>
+		<if test = "hFreeChargeVtime != null and hFreeChargeVtime != ''">
+			h_free_charge_vtime,
+		</if>
+		<if test = "joinCnt != null and joinCnt != ''">
+			join_cnt,
+		</if>
+		<if test = "viewDate != null and viewDate != ''">
+			view_date,
+		</if>
+		<if test = "proType != null and proType != ''">
+			pro_type,
+		</if>
+		<if test = "channelId != null and channelId != ''">
+			channel_id,
+		</if>
+		<if test = "tempData != null and tempData != ''">
+			temp_data,
+		</if>
+		pc_seq,c_seq,input_id
+		)
+		values (
+		<if test = "pSeq != null and pSeq != ''">
+			(SELECT op_seq FROM PROGRAM WHERE p_seq=#{pSeq} ),
+		</if>
+		<if test = "tgSeq != null and tgSeq != ''">
+			#{tgSeq} ,
+		</if>
+		<if test = "screenType != null and screenType != ''">
+			#{screenType} ,
+		</if>
+		<if test = "chargeYn != null and chargeYn != ''">
+			#{chargeYn} ,
+		</if>
+		<if test = "amount != null and amount != ''">
+			#{amount} ,
+		</if>
+		<if test = "totalAmount != null and totalAmount != ''">
+			#{totalAmount} ,
+		</if>
+		<if test = "chargeCnt != null and chargeCnt != ''">
+			#{chargeCnt} ,
+		</if>
+		<if test = "hChargeCnt != null and hChargeCnt != ''">
+			#{hChargeCnt} ,
+		</if>
+		<if test = "freeChargeCnt != null and freeChargeCnt != ''">
+			#{freeChargeCnt} ,
+		</if>
+		<if test = "hFreeChargeCnt != null and hFreeChargeCnt != ''">
+			#{hFreeChargeCnt} ,
+		</if>
+		<if test = "chargeVtime != null and chargeVtime != ''">
+			#{chargeVtime} ,
+		</if>
+		<if test = "hChargeVtime != null and hChargeVtime != ''">
+			 #{hChargeVtime} ,
+		</if>
+		<if test = "freeChargeVtime != null and freeChargeVtime != ''">
+			#{freeChargeVtime} ,
+		</if>
+		<if test = "hFreeChargeVtime != null and hFreeChargeVtime != ''">
+			#{hFreeChargeVtime} ,
+		</if>
+		<if test = "joinCnt != null and joinCnt != ''">
+			#{joinCnt},
+		</if>
+		<if test = "viewDate != null and viewDate != ''">
+			STR_TO_DATE(#{viewDate},'%Y%m%d') ,
+		</if>
+		<if test = "proType != null and proType != ''">
+			#{proType} ,
+		</if>
+		<if test = "channelId != null and channelId != ''">
+			 #{channelId},
+		</if>
+		<if test = "tempData != null and tempData != ''">
+			#{tempData},
+		</if>
+		#{pcSeq},(SELECT c_seq FROM company where c_nm=#{comNm} and c_type='P') ,#{inputId}
+		)
+	</insert>
+	
+	
+	<select id="selectMViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.MinuteScheduleRateVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  m_view_rating
+		WHERE broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d%k%i%s') AND area=#{area} AND channel = (SELECT code_id from code where code_type='18' and code_nm=#{channel}) 
+	</select>
+	
+	<update id="updateMViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.MinuteScheduleRateVo" >
+		update m_view_rating 
+		set  
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq= #{tgSeq} ,
+		</if>
+		<if test = "broadDate != null and broadDate != ''">
+			broad_date= STR_TO_DATE(#{broadDate},'%Y%m%d%k%i%s') ,
+		</if>
+		<if test = "researchAgency != null and researchAgency != ''">
+			research_agency= #{researchAgency} ,
+		</if>
+		<if test = "area != null and area != ''">
+			area= #{area} ,
+		</if>
+		<if test = "channel != null and channel != ''">
+			channel = (SELECT code_id from code where code_type='18' and code_nm=#{channel})  ,
+		</if>
+		<if test = "air_time != null and air_time != ''">
+			air_time= #{air_time} ,
+		</if>
+		<if test = "house != null and house != ''">
+			house= #{house} ,
+		</if>
+		<if test = "personal != null and personal != ''">
+			personal= #{personal} ,
+		</if>
+		<if test = "cable != null and cable != ''">
+			cable= #{cable} ,
+		</if>
+		<if test = "wireless != null and wireless != ''">
+			wireless= #{wireless} ,
+		</if>
+		<if test = "man != null and man != ''">
+			man= #{man} ,
+		</if>
+		<if test = "woman != null and woman != ''">
+			woman= #{woman} ,
+		</if>
+		<if test = "u10 != null and u10 != ''">
+			u10= #{u10} ,
+		</if>
+		<if test = "s10 != null and s10 != ''">
+			s10= #{s10} ,
+		</if>
+		<if test = "s20 != null and s20 != ''">
+			s20= #{s20} ,
+		</if>
+		<if test = "s30 != null and s30 != ''">
+			s30= #{s30} ,
+		</if>
+		<if test = "s40 != null and s40 != ''">
+			s40= #{s40} ,
+		</if>
+		<if test = "o50 != null and o50 != ''">
+			o50= #{o50} ,
+		</if>
+		<if test = "mu10 != null and mu10 != ''">
+			mu10= #{mu10} ,
+		</if>
+		<if test = "ms10 != null and ms10 != ''">
+			ms10= #{ms10} ,
+		</if>
+		<if test = "ms20 != null and ms20 != ''">
+			ms20= #{ms20} ,
+		</if>
+		<if test = "ms30 != null and ms30 != ''">
+			ms30= #{ms30} ,
+		</if>
+		<if test = "ms40 != null and ms40 != ''">
+			ms40= #{ms40} ,
+		</if>
+		<if test = "mo50 != null and mo50 != ''">
+			mo50= #{mo50} ,
+		</if>
+		<if test = "wu10 != null and wu10 != ''">
+			wu10= #{wu10} ,
+		</if>
+		<if test = "ws10 != null and ws10 != ''">
+			ws10= #{ws10} ,
+		</if>
+		<if test = "ws20 != null and ws20 != ''">
+			ws20= #{ws20} ,
+		</if>
+		<if test = "ws30 != null and ws30 != ''">
+			ws30= #{ws30} ,
+		</if>
+		<if test = "ws40 != null and ws40 != ''">
+			ws40= #{ws40} ,
+		</if>
+		<if test = "wo50 != null and wo50 != ''">
+			wo50= #{wo50} ,
+		</if>
+		<if test = "unEl != null and unEl != ''">
+			un_el= #{unEl} ,
+		</if>
+		<if test = "miSc != null and miSc != ''">
+			mi_sc= #{miSc} ,
+		</if>
+		<if test = "miGr != null and miGr != ''">
+			mi_gr= #{miGr} ,
+		</if>
+		<if test = "hiGr != null and hiGr != ''">
+			hi_gr= #{hiGr} ,
+		</if>
+		<if test = "ovUn != null and ovUn != ''">
+			ov_un= #{ovUn} ,
+		</if>
+		<if test = "hoWife != null and hoWife != ''">
+			ho_wife= #{hoWife} ,
+		</if>
+		<if test = "unIncome150 != null and unIncome150 != ''">
+			un_income_150= #{unIncome150} ,
+		</if>
+		<if test = "ovIncome150 != null and ovIncome150 != ''">
+			ov_income_150= #{ovIncome150} ,
+		</if>
+		<if test = "income200 != null and income200 != ''">
+			income_200= #{income200} ,
+		</if>
+		<if test = "income300 != null and income300 != ''">
+			income_300= #{income300} ,
+		</if>
+		<if test = "income400 != null and income400 != ''">
+			income_400= #{income400} ,
+		</if>
+		<if test = "ovIncome500 != null and ovIncome500 != ''">
+			ov_income_500= #{ovIncome500} ,
+		</if>
+		update_dt =NOW()
+		WHERE broad_date = #{broadDate} AND area=#{area} AND channel = #{channel}
+	</update>
+	
+	<insert id="insertMViewRate" parameterType ="kr.co.kbs.distribute.schedule.vo.MinuteScheduleRateVo" >
+		INSERT INTO m_view_rating ( 
+		 <if test = "tgSeq != null and tgSeq != ''">
+			tg_seq ,
+		</if>
+		<if test = "broadDate != null and broadDate != ''">
+			broad_date ,
+		</if>
+		<if test = "researchAgency != null and researchAgency != ''">
+			research_agency,
+		</if>
+		<if test = "area != null and area != ''">
+			area ,
+		</if>
+		<if test = "channel != null and channel != ''">
+			channel ,
+		</if>
+		<if test = "air_time != null and air_time != ''">
+			air_time ,
+		</if>
+		<if test = "house != null and house != ''">
+			house,
+		</if>
+		<if test = "personal != null and personal != ''">
+			personal,
+		</if>
+		<if test = "cable != null and cable != ''">
+			cable ,
+		</if>
+		<if test = "wireless != null and wireless != ''">
+			wireless,
+		</if>
+		<if test = "man != null and man != ''">
+			man,
+		</if>
+		<if test = "woman != null and woman != ''">
+			woman ,
+		</if>
+		<if test = "u10 != null and u10 != ''">
+			u10,
+		</if>
+		<if test = "s10 != null and s10 != ''">
+			s10,
+		</if>
+		<if test = "s20 != null and s20 != ''">
+			s20 ,
+		</if>
+		<if test = "s30 != null and s30 != ''">
+			s30,
+		</if>
+		<if test = "s40 != null and s40 != ''">
+			s40,
+		</if>
+		<if test = "o50 != null and o50 != ''">
+			o50,
+		</if>
+		<if test = "mu10 != null and mu10 != ''">
+			mu10 ,
+		</if>
+		<if test = "ms10 != null and ms10 != ''">
+			ms10,
+		</if>
+		<if test = "ms20 != null and ms20 != ''">
+			ms20 ,
+		</if>
+		<if test = "ms30 != null and ms30 != ''">
+			ms30,
+		</if>
+		<if test = "ms40 != null and ms40 != ''">
+			ms40,
+		</if>
+		<if test = "mo50 != null and mo50 != ''">
+			mo50,
+		</if>
+		<if test = "wu10 != null and wu10 != ''">
+			wu10,
+		</if>
+		<if test = "ws10 != null and ws10 != ''">
+			ws10,
+		</if>
+		<if test = "ws20 != null and ws20 != ''">
+			ws20,
+		</if>
+		<if test = "ws30 != null and ws30 != ''">
+			ws30,
+		</if>
+		<if test = "ws40 != null and ws40 != ''">
+			ws40,
+		</if>
+		<if test = "wo50 != null and wo50 != ''">
+			wo50,
+		</if>
+		<if test = "unEl != null and unEl != ''">
+			un_el,
+		</if>
+		<if test = "miSc != null and miSc != ''">
+			mi_sc,
+		</if>
+		<if test = "miGr != null and miGr != ''">
+			mi_gr,
+		</if>
+		<if test = "hiGr != null and hiGr != ''">
+			hi_gr,
+		</if>
+		<if test = "ovUn != null and ovUn != ''">
+			ov_un,
+		</if>
+		<if test = "hoWife != null and hoWife != ''">
+			ho_wife,
+		</if>
+		<if test = "unIncome150 != null and unIncome150 != ''">
+			un_income_150,
+		</if>
+		<if test = "ovIncome150 != null and ovIncome150 != ''">
+			ov_income_150,
+		</if>
+		<if test = "income200 != null and income200 != ''">
+			income_200,
+		</if>
+		<if test = "income300 != null and income300 != ''">
+			income_300,
+		</if>
+		<if test = "income400 != null and income400 != ''">
+			income_400,
+		</if>
+		<if test = "ovIncome500 != null and ovIncome500 != ''">
+			ov_income_500,
+		</if>
+		input_id
+		)
+		values (
+		<if test = "tgSeq != null and tgSeq != ''">
+			#{tgSeq} ,
+		</if>
+		<if test = "broadDate != null and broadDate != ''">
+			STR_TO_DATE(#{broadDate},'%Y%m%d%k%i%s') ,
+		</if>
+		<if test = "researchAgency != null and researchAgency != ''">
+			#{researchAgency} ,
+		</if>
+		<if test = "area != null and area != ''">
+			#{area} ,
+		</if>
+		<if test = "channel != null and channel != ''">
+			(SELECT code_id from code where code_type='18' and code_nm=#{channel}) ,
+		</if>
+		<if test = "air_time != null and air_time != ''">
+			#{air_time} ,
+		</if>
+		<if test = "house != null and house != ''">
+			#{house} ,
+		</if>
+		<if test = "personal != null and personal != ''">
+			#{personal} ,
+		</if>
+		<if test = "cable != null and cable != ''">
+			#{cable} ,
+		</if>
+		<if test = "wireless != null and wireless != ''">
+			#{wireless} ,
+		</if>
+		<if test = "man != null and man != ''">
+			#{man} ,
+		</if>
+		<if test = "woman != null and woman != ''">
+			#{woman} ,
+		</if>
+		<if test = "u10 != null and u10 != ''">
+			#{u10} ,
+		</if>
+		<if test = "s10 != null and s10 != ''">
+			#{s10} ,
+		</if>
+		<if test = "s20 != null and s20 != ''">
+			#{s20} ,
+		</if>
+		<if test = "s30 != null and s30 != ''">
+			#{s30} ,
+		</if>
+		<if test = "s40 != null and s40 != ''">
+			#{s40} ,
+		</if>
+		<if test = "o50 != null and o50 != ''">
+			#{o50} ,
+		</if>
+		<if test = "mu10 != null and mu10 != ''">
+			#{mu10} ,
+		</if>
+		<if test = "ms10 != null and ms10 != ''">
+			#{ms10} ,
+		</if>
+		<if test = "ms20 != null and ms20 != ''">
+			#{ms20} ,
+		</if>
+		<if test = "ms30 != null and ms30 != ''">
+			#{ms30} ,
+		</if>
+		<if test = "ms40 != null and ms40 != ''">
+			 #{ms40} ,
+		</if>
+		<if test = "mo50 != null and mo50 != ''">
+			 #{mo50} ,
+		</if>
+		<if test = "wu10 != null and wu10 != ''">
+			 #{wu10} ,
+		</if>
+		<if test = "ws10 != null and ws10 != ''">
+			#{ws10} ,
+		</if>
+		<if test = "ws20 != null and ws20 != ''">
+			#{ws20} ,
+		</if>
+		<if test = "ws30 != null and ws30 != ''">
+			#{ws30} ,
+		</if>
+		<if test = "ws40 != null and ws40 != ''">
+			#{ws40} ,
+		</if>
+		<if test = "wo50 != null and wo50 != ''">
+			#{wo50} ,
+		</if>
+		<if test = "unEl != null and unEl != ''">
+			#{unEl} ,
+		</if>
+		<if test = "miSc != null and miSc != ''">
+			#{miSc} ,
+		</if>
+		<if test = "miGr != null and miGr != ''">
+			#{miGr} ,
+		</if>
+		<if test = "hiGr != null and hiGr != ''">
+			#{hiGr} ,
+		</if>
+		<if test = "ovUn != null and ovUn != ''">
+			#{ovUn} ,
+		</if>
+		<if test = "hoWife != null and hoWife != ''">
+			#{hoWife} ,
+		</if>
+		<if test = "unIncome150 != null and unIncome150 != ''">
+			 #{unIncome150} ,
+		</if>
+		<if test = "ovIncome150 != null and ovIncome150 != ''">
+			#{ovIncome150} ,
+		</if>
+		<if test = "income200 != null and income200 != ''">
+			#{income200} ,
+		</if>
+		<if test = "income300 != null and income300 != ''">
+			#{income300} ,
+		</if>
+		<if test = "income400 != null and income400 != ''">
+			#{income400} ,
+		</if>
+		<if test = "ovIncome500 != null and ovIncome500 != ''">
+			#{ovIncome500} ,
+		</if>#{inputId}
+		)
+	</insert>
+	
+	<select id="selectUsageStatChannel" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatChannelVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  usage_Stat_Channel
+		WHERE channel = (SELECT code_id from code where code_type='18' and code_nm=#{channel}) and broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d%k%i')  and sex_gubun = #{sexGubun}
+	</select>
+	
+	<update id="updateUsageStatChannel" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatChannelVo" >
+		update usage_Stat_Channel 
+		set  
+		c_seq = (SELECT c_seq FROM company where c_nm=#{cNm} and c_type='P'),
+		channel = (SELECT code_id from code where code_type='18' and code_nm=#{channel}) ,
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq= #{tgSeq} ,
+		</if>
+		<if test = "age0Vcnt != null and age0Vcnt != ''">
+			age0_Vcnt= #{age0Vcnt} ,
+		</if>
+		<if test = "age20Vcnt != null and age20Vcnt != ''">
+			age20_Vcnt= #{age20Vcnt} ,
+		</if>
+		<if test = "age30Vcnt != null and age30Vcnt != ''">
+			age30_Vcnt= #{age30Vcnt} ,
+		</if>
+		<if test = "age40Vcnt != null and age40Vcnt != ''">
+			age40_Vcnt= #{age40Vcnt} ,
+		</if>
+		<if test = "age50Vcnt != null and age50Vcnt != ''">
+			age50_Vcnt= #{age50Vcnt} ,
+		</if>
+		broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d%k%i') ,
+		sex_gubun=#{sexGubun}
+		WHERE channel = (SELECT code_id from code where code_type='18' and code_nm=#{channel})  and broad_date = STR_TO_DATE(#{broadDate},'%Y%m%d%k%i')  and sex_gubun = #{sexGubun}
+	</update>
+	
+	<insert id="insertUsageStatChannel" parameterType ="kr.co.kbs.distribute.schedule.vo.UseStatChannelVo" >
+		INSERT INTO usage_Stat_Channel ( 
+		 c_seq ,
+		channel,
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq ,
+		</if>
+		<if test = "age0Vcnt != null and age0Vcnt != ''">
+			age0_Vcnt ,
+		</if>
+		<if test = "age20Vcnt != null and age20Vcnt != ''">
+			age20_Vcnt ,
+		</if>
+		<if test = "age30Vcnt != null and age30Vcnt != ''">
+			age30_Vcnt ,
+		</if>
+		<if test = "age40Vcnt != null and age40Vcnt != ''">
+			age40_Vcnt ,
+		</if>
+		<if test = "age50Vcnt != null and age50Vcnt != ''">
+			age50_Vcnt,
+		</if>
+		broad_date ,
+		sex_gubun,input_id
+		)
+		values (
+		 (SELECT c_seq FROM company where c_nm=#{cNm} and c_type='P'),
+		(SELECT code_id from code where code_type='18' and code_nm=#{channel}) ,
+		<if test = "tgSeq != null and tgSeq != ''">
+			#{tgSeq} ,
+		</if>
+		<if test = "age0Vcnt != null and age0Vcnt != ''">
+			 #{age0Vcnt} ,
+		</if>
+		<if test = "age20Vcnt != null and age20Vcnt != ''">
+			 #{age20Vcnt} ,
+		</if>
+		<if test = "age30Vcnt != null and age30Vcnt != ''">
+			#{age30Vcnt} ,
+		</if>
+		<if test = "age40Vcnt != null and age40Vcnt != ''">
+			#{age40Vcnt} ,
+		</if>
+		<if test = "age50Vcnt != null and age50Vcnt != ''">
+			#{age50Vcnt} ,
+		</if>
+		STR_TO_DATE(#{broadDate},'%Y%m%d%k%i') ,
+		#{sexGubun},'admin'
+		)
+	</insert>
+	
+	<select id="selectClip" parameterType ="kr.co.kbs.distribute.schedule.vo.UseClipVo"   resultType="java.lang.Integer">
+		select count(*) cnt from  clip
+		WHERE view_date = STR_TO_DATE(#{viewDate} ,'%Y%m%d')  and clip_id = #{clipId}
+	</select>
+	
+	
+	<update id="updateClip" parameterType ="kr.co.kbs.distribute.schedule.vo.UseClipVo" >
+		update clip 
+		set  
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq= #{tgSeq} ,
+		</if>
+		<if test = "programId != null and programId != ''">
+			p_seq= (SELECT p_seq  FROM PROGRAM where program_id=#{programId}) ,
+		</if>
+		<if test = "contentsId != null and contentsId != ''">
+			pc_seq=  (SELECT  pc_seq FROM contents where contents_id=#{contentsId} limit 1),
+		</if>
+		<if test = "clipId != null and clipId != ''">
+			clip_id= #{clipId} ,
+		</if>
+		<if test = "clipNm != null and clipNm != ''">
+			clip_nm= #{clipNm} ,
+		</if>
+		<if test = "viewCnt != null and viewCnt != ''">
+			view_cnt= #{viewCnt} ,
+		</if>
+		view_date = STR_TO_DATE(#{viewDate} ,'%Y%m%d')
+		WHERE view_date = STR_TO_DATE(#{viewDate} ,'%Y%m%d')  and clip_id = #{clipId}
+	</update>
+	
+	<insert id="insertClip" parameterType ="kr.co.kbs.distribute.schedule.vo.UseClipVo" >
+		INSERT INTO clip ( 
+		<if test = "tgSeq != null and tgSeq != ''">
+			tg_seq ,
+		</if>
+		<if test = "programId != null and programId != ''">
+			p_seq ,
+		</if>
+		<if test = "contentsId != null and contentsId != ''">
+			pc_seq,
+		</if>
+		<if test = "clipId != null and clipId != ''">
+			clip_id,
+		</if>
+		<if test = "clipNm != null and clipNm != ''">
+			clip_nm,
+		</if>
+		<if test = "viewCnt != null and viewCnt != ''">
+			view_cnt,
+		</if>
+		view_date
+		)
+		values (
+		 <if test = "tgSeq != null and tgSeq != ''">
+			#{tgSeq} ,
+		</if>
+		<if test = "programId != null and programId != ''">
+			(SELECT p_seq  FROM PROGRAM where program_id=#{programId}) ,
+		</if>
+		<if test = "contentsId != null and contentsId != ''">
+			 (SELECT  pc_seq FROM contents where contents_id=#{contentsId} limit 1),
+		</if>
+		<if test = "clipId != null and clipId != ''">
+			#{clipId} ,
+		</if>
+		<if test = "clipNm != null and clipNm != ''">
+			#{clipNm},
+		</if>
+		<if test = "viewCnt != null and viewCnt != ''">
+			#{viewCnt} ,
+		</if>
+		STR_TO_DATE(#{viewDate} ,'%Y%m%d')
+		)
+	</insert>
+	
+	
+	<update id="excuteLast">
+		update clip a ,contents b
+		set a.p_seq=b.p_seq,
+		a.pc_seq=b.pc_seq
+		WHERE REGEXP_REPLACE(a.clip_id,"_T\\d{4}-\\d{4}_SC\\d{2}$|_SC\\d{2}_\\d{4,}$|_null_\\d{2,}$|_\\d{4,}_SC\\d{2,}$|_\\d{4,}-CS\\d{2,}$|_\\d{6,}_TS\\d{2,}$|_TSC\\d{2,}$|_LC\\d{2,}$|_TS\\d{2,}$|_SC\\d{2}-\\d{1,}$|_\\d{1,}-SC\\d{2,}$|_SC\\d{2,}$|_SC\\d{3,}-\\d{1,}$|_\\d{3,}_SC\\d{2}$|_SC\\d{2}$|_\\d{4}$", "")=b.contents_id
+		and (a.pc_seq is null or a.pc_seq =-1)
+	</update>
+	
+	
+	<update id="excuteLastDcViewLating">
+		update dc_view_rating a ,contents b
+			set a.p_seq=b.p_seq,
+				a.pc_seq= b.pc_seq,
+				a.update_dt=current_timestamp()
+		 where REGEXP_REPLACE(a.contents_id,"_SC\\d{2}-\\d{2,}$|_\\d{3,}-SC\\d{2,}$|_SC\\d{2,}$|_SC\\d{3,}-\\d{1,}$|_\\d{3,}_SC\\d{2}$|_SC\\d{2}$", "")=b.contents_id
+			and (a.pc_seq is null OR a.pc_seq=-1)
+	</update>
+	
+	
+	<insert id="excuteDViewRating">
+		insert into d_view_rating (broad_date,channel,view_rating_age,view_rating_house,input_id)
+		select a.broad_date, a.channel, (a.s20+a.s30+a.s40)/3 as view_rating_age,a.house as view_rating_house,'SYSTEM'
+		from m_view_rating a
+		ON DUPLICATE KEY UPDATE view_rating_age = (a.s20+a.s30+a.s40)/3 ,view_rating_house=a.house
+	</insert>
+	
+	
+	<update id="excuteClipPSETNotNullSet">
+		update clip 
+		set p_seq=-1
+		where p_seq is null
+	</update>
+	
+	
+	<update id="excuteClipPCSETNotNullSet">
+		update clip 
+		set pc_seq=-1
+		where pc_seq is null
+	</update>
+	
+	<update id="excuteDcViewRatingUpdate">
+		update dc_view_rating a
+		set a.pooq_viewcnt =  
+		(select (sum(b.age0_vcnt)+sum(b.age20_vcnt)+sum(b.age30_vcnt)+sum(b.age40_vcnt)+sum(b.age50_vcnt))/count(usc_seq)
+		from usage_stat_channel b
+		WHERE b.channel=a.channel
+		and b.broad_date<![CDATA[ >= ]]>a.broad_stdt
+		and b.broad_date<![CDATA[ < ]]>a.broad_eddt
+		)
+		where a.stat_code='00'
+		and channel in(11,12,13,14)
+		and a.broad_date <![CDATA[ >= ]]> date_add(now(), interval -3 day)  
+		order by a.broad_date
+	</update>
+	
+</mapper>

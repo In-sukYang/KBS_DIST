@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.PooqVodDetailMapper">
+	
+	<select id="selectPooqVodDatailList1" parameterType="programParamVo" resultType="pooqVodDetailVo">
+		<![CDATA[
+				
+		SELECT 
+			DATE_FORMAT(B.VIEW_DATE, '%Y-%m-%d')  as BROAD_DATE,
+			A.VODCNT,
+			SUM(CHARGE_CNT) AS CHARGE_CNT,
+			SUM(H_CHARGE_CNT)  AS H_CHARGE_CNT,
+			SUM(FREE_CHARGE_CNT) AS FREE_CHARGE_CNT,
+			SUM(H_FREE_CHARGE_CNT)  AS H_FREE_CHARGE_CNT,
+			SUM(CHARGE_VTIME) AS CHARGE_VTIME,
+			SUM(H_CHARGE_VTIME)  AS H_CHARGE_VTIME,
+			SUM(FREE_CHARGE_VTIME) AS FREE_CHARGE_VTIME,
+			SUM(H_FREE_CHARGE_VTIME) AS H_FREE_CHARGE_VTIME
+		FROM CONTENTS A , USAGE_STAT_PROGRAM B  
+		WHERE A.REVIEW_YN ='N'
+		AND A.P_SEQ = #{pSeq}
+		AND A.BROAD_DATE >= #{searchValue}
+		AND A.BROAD_DATE <= #{searchValue2}
+		AND B.PC_SEQ = A.PC_SEQ 
+		AND B.VIEW_DATE > #{searchValue}
+		AND B.VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d')
+		GROUP BY VODCNT,B.VIEW_DATE
+		ORDER BY BROAD_DATE
+		]]>
+		<!--
+		SELECT 
+			A.BROAD_DATE, A.VODCNT,
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS CHARGE_CNT,
+			IFNULL((SELECT SUM(H_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS H_CHARGE_CNT,
+			IFNULL((SELECT SUM(FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS H_FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS H_CHARGE_VTIME,
+			IFNULL((SELECT SUM(FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS FREE_CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') AND C_SEQ = 11), 0) AS H_FREE_CHARGE_VTIME
+		FROM CONTENTS A
+		WHERE A.REVIEW_YN ='N'
+		AND A.P_SEQ = #{pSeq}
+		AND A.BROAD_DATE >= #{searchValue}
+		AND A.BROAD_DATE <= #{searchValue2}
+		ORDER BY BROAD_DATE
+		-->
+	</select>
+	
+	<select id="selectPooqVodDatailList2" parameterType="programParamVo" resultType="pooqVodDetailVo">
+		
+		select  dt.yyyymmdd AS BROAD_DATE, #{broadDate} AS BROAD_DATE2, 
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd  AND C_SEQ = 11), 0) AS CHARGE_CNT,
+			IFNULL((SELECT SUM(H_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_CHARGE_CNT,
+			IFNULL((SELECT SUM(FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_CHARGE_VTIME,
+			IFNULL((SELECT SUM(FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS FREE_CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_FREE_CHARGE_VTIME
+		from    (
+        	select
+        	    curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as yyyymmdd
+            	,a.a as aa
+                ,b.a as ba
+                ,c.a as ca
+        	from    
+        		(select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+        	) dt , (SELECT PC_SEQ FROM CONTENTS WHERE BROAD_DATE = #{broadDate} AND P_SEQ = #{pSeq} AND REVIEW_YN ='N') b
+		WHERE dt.yyyymmdd >= #{searchValue} 
+		AND <![CDATA[  dt.yyyymmdd <= #{searchValue2} ]]>
+		ORDER BY DT.YYYYMMDD
+		
+		<!-- 
+		select  dt.yyyymmdd, #{broadDate} AS BROAD_DATE, 
+			IFNULL((SELECT SUM(CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd  AND C_SEQ = 11), 0) AS CHARGE_CNT,
+			IFNULL((SELECT SUM(H_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_CHARGE_CNT,
+			IFNULL((SELECT SUM(FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_CNT) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_FREE_CHARGE_CNT,
+			IFNULL((SELECT SUM(CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_CHARGE_VTIME,
+			IFNULL((SELECT SUM(FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS FREE_CHARGE_VTIME,
+			IFNULL((SELECT SUM(H_FREE_CHARGE_VTIME) FROM USAGE_STAT_PROGRAM  WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd AND C_SEQ = 11), 0) AS H_FREE_CHARGE_VTIME
+		from    (
+        	select
+        	    curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as yyyymmdd
+            	,a.a as aa
+                ,b.a as ba
+                ,c.a as ca
+        	from    
+        		(select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+        	) dt , (SELECT PC_SEQ FROM CONTENTS WHERE BROAD_DATE = #{broadDate} AND P_SEQ = #{pSeq} AND REVIEW_YN ='N') b
+		WHERE dt.yyyymmdd >= #{searchValue} 
+		AND <![CDATA[  dt.yyyymmdd <= #{searchValue2} ]]>
+		ORDER BY DT.YYYYMMDD
+		 -->
+	</select>
+	
+	
+</mapper>

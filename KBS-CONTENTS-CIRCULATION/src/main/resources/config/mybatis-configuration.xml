@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "HTTP://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+ 		<setting name="lazyLoadingEnabled" value="false" /> 
+		<setting name="aggressiveLazyLoading" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="autoMappingBehavior" value="FULL" />
+		<setting name="defaultExecutorType" value="BATCH" />
+		<setting name="defaultStatementTimeout" value="1250" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+<!-- 		<setting name="localCacheScope" value="SESSION" /> -->
+<!-- 		<setting name="jdbcTypeForNull" value="NULL"/> -->
+<!-- 		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" /> -->
+		
+	</settings>
+	
+	<typeAliases>
+		<package name="kr.co.kbs.distribute.member.vo"/>
+		<package name="kr.co.kbs.distribute.company.vo"/>
+		<package name="kr.co.kbs.distribute.program.vo"/>
+		<package name="kr.co.kbs.distribute.code.vo"/>
+		<package name="kr.co.kbs.distribute.media.vo"/>
+		<package name="kr.co.kbs.distribute.menu.vo"/>
+		<package name="kr.co.kbs.distribute.rate.vo"/>
+		<package name="kr.co.kbs.distribute.channel.vo"/>
+		<package name="kr.co.kbs.distribute.statusboard.vo"/>
+		<package name="kr.co.kbs.distribute.pairing.vo"/>
+		<package name="kr.co.kbs.distribute.dashboard.vo"/>
+		<package name="kr.co.kbs.distribute.common.vo"/>
+		
+		
+	</typeAliases>
+	
+</configuration>	

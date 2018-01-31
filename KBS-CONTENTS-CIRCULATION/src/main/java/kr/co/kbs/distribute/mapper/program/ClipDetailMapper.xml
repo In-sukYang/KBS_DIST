@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.ClipDetailMapper">
+	
+	<select id="selectClipDatailList1" parameterType="programParamVo" resultType="clipDetailVo">
+		<![CDATA[
+		SELECT 
+			A.BROAD_DATE, A.VODCNT,
+			IFNULL((SELECT SUM(VIEW_CNT) FROM CLIP WHERE PC_SEQ = A.PC_SEQ AND VIEW_DATE <= DATE_FORMAT(DATE_ADD(A.BROAD_DATE, INTERVAL + #{addDay} DAY ), '%Y-%m-%d') ),0) CLIP_CNT
+		FROM CONTENTS A
+		WHERE A.REVIEW_YN ='N'
+		AND A.P_SEQ = #{pSeq}
+		AND A.BROAD_DATE >= #{searchValue}
+		AND A.BROAD_DATE <= #{searchValue2}
+		ORDER BY BROAD_DATE
+		]]>
+	</select>
+	
+	<select id="selectClipDatailList2" parameterType="programParamVo" resultType="clipDetailVo">
+		
+		select  dt.yyyymmdd, #{broadDate} AS BROAD_DATE, 
+			IFNULL((SELECT SUM(VIEW_CNT) FROM CLIP WHERE PC_SEQ = B.PC_SEQ AND VIEW_DATE = dt.yyyymmdd ),0) CLIP_CNT
+		from    (
+        	select
+        	    curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as yyyymmdd
+            	,a.a as aa
+                ,b.a as ba
+                ,c.a as ca
+        	from    
+        		(select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+        		cross join  (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+        	) dt , (SELECT PC_SEQ FROM CONTENTS WHERE BROAD_DATE = #{broadDate} AND P_SEQ = #{pSeq} AND REVIEW_YN ='N') b
+		WHERE dt.yyyymmdd >= #{searchValue} 
+		AND <![CDATA[  dt.yyyymmdd <= #{searchValue2} ]]>
+		ORDER BY DT.YYYYMMDD
+		
+	</select>
+	
+	
+</mapper>

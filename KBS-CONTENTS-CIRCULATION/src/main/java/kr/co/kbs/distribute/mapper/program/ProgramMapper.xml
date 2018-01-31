@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.ProgramMapper">
+	
+	<select id="selectProgramList" parameterType="programParamVo" resultType="programVo">
+		SELECT
+			P_SEQ, OP_SEQ, PARENT_P_SEQ, IFNULL(PARENT_NM, '') AS PARENT_NM, 
+			IFNULL(O_PROGRAM_NM, '') AS O_PROGRAM_NM, C_SEQ, 
+			PROGRAM_ID, PROGRAM_NM, PROGRAM_TYPE, CORNER_ID, WEEKDAY, 
+			BROAD_ID, CHANNEL_ID, INPUT_ID, INPUT_DT, UPDATE_ID, 
+			UPDATE_DT 
+		FROM (		
+			SELECT 
+				P_SEQ, OP_SEQ, PARENT_P_SEQ, 
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.PARENT_P_SEQ) AS PARENT_NM,
+				(SELECT O_PROGRAM_NM FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_NM,
+				C_SEQ, PROGRAM_ID, 
+				PROGRAM_NM, PROGRAM_TYPE, CORNER_ID, WEEKDAY, CHANNEL_ID,
+				BROAD_ID, INPUT_ID, INPUT_DT, UPDATE_ID, UPDATE_DT
+			FROM PROGRAM A
+		) TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND TT.PARENT_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					AND TT.PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+			
+			<if test="inputDt !=null and inputDt !=''">
+				AND DATE_FORMAT(TT.INPUT_ID, '%Y%m%d') = #{inputDt}
+			</if>
+			
+			<if test=" pSeqType !=null and pSeqType !='' and pSeqType == '01'">
+				AND TT.PARENT_P_SEQ IS NULL
+			</if>
+			
+			<if test="pSeqType !=null and pSeqType !='' and pSeqType == '02'">
+				AND TT.PARENT_P_SEQ IS NOT NULL 
+			</if>
+			
+		</where>
+		ORDER BY P_SEQ
+		LIMIT #{offset}, #{noOfRecords}
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int" >
+        SELECT
+			COUNT(P_SEQ)
+		FROM (		
+			SELECT 
+				P_SEQ, OP_SEQ, PARENT_P_SEQ, 
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.PARENT_P_SEQ) AS PARENT_NM,
+				C_SEQ, PROGRAM_ID, 
+				PROGRAM_NM, PROGRAM_TYPE, CORNER_ID, WEEKDAY, CHANNEL_ID,
+				BROAD_ID, INPUT_ID, INPUT_DT, UPDATE_ID, UPDATE_DT
+			FROM PROGRAM A
+		) TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND TT.PARENT_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					AND TT.PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+			
+			<if test="inputDt !=null and inputDt !=''">
+				AND DATE_FORMAT(TT.INPUT_ID, '%Y%m%d') = #{inputDt}
+			</if>
+			
+			<if test=" pSeqType !=null and pSeqType !='' and pSeqType == '01'">
+				AND TT.PARENT_P_SEQ IS NULL
+			</if>
+			
+			<if test="pSeqType !=null and pSeqType !='' and pSeqType == '02'">
+				AND TT.PARENT_P_SEQ IS NOT NULL 
+			</if>
+			
+		</where>
+		ORDER BY P_SEQ
+    </select>
+
+	<select id="selectProgramListLayer" parameterType="programParamVo" resultType="programVo">
+		SELECT
+			P_SEQ, OP_SEQ, PARENT_P_SEQ, IFNULL(PARENT_NM, '') AS PARENT_NM, 
+			IFNULL(O_PROGRAM_NM, '') AS O_PROGRAM_NM, C_SEQ, 
+			PROGRAM_ID, PROGRAM_NM, PROGRAM_TYPE, CORNER_ID, WEEKDAY, 
+			BROAD_ID, CHANNEL_ID, INPUT_ID, INPUT_DT, UPDATE_ID, 
+			UPDATE_DT 
+		FROM (		
+			SELECT 
+				P_SEQ, OP_SEQ, PARENT_P_SEQ, 
+				(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.PARENT_P_SEQ) AS PARENT_NM,
+				(SELECT O_PROGRAM_NM FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ) AS O_PROGRAM_NM,
+				C_SEQ, PROGRAM_ID, 
+				PROGRAM_NM, PROGRAM_TYPE, CORNER_ID, WEEKDAY, CHANNEL_ID,
+				BROAD_ID, INPUT_ID, INPUT_DT, UPDATE_ID, UPDATE_DT
+			FROM PROGRAM A
+		) TT
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND TT.PROGRAM_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND TT.PARENT_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					AND TT.PROGRAM_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+			</if>
+			
+			<if test="inputDt !=null and inputDt !=''">
+				AND DATE_FORMAT(TT.INPUT_ID, '%Y%m%d') = #{inputDt}
+			</if>
+			
+			<if test=" pSeqType !=null and pSeqType !='' and pSeqType == '01'">
+				AND TT.PARENT_P_SEQ IS NULL
+			</if>
+			
+			<if test="pSeqType !=null and pSeqType !='' and pSeqType == '02'">
+				AND TT.PARENT_P_SEQ IS NOT NULL 
+			</if>
+			
+		</where>
+		ORDER BY P_SEQ
+	</select>
+
+
+	<insert id="insertProgram" parameterType="programVo">
+		INSERT INTO PROGRAM(
+			OP_SEQ, 
+			PARENT_P_SEQ, 
+			C_SEQ, 
+			PROGRAM_ID, 
+			PROGRAM_NM, 
+			PROGRAM_TYPE, 
+			CORNER_ID, 
+			WEEKDAY, 
+			BROAD_ID, 
+			CHANNEL_ID, 
+			INPUT_ID, 
+			INPUT_DT
+		)VALUES (
+			#{opSeq}, 
+			#{parentPSeq}, 
+			#{cSeq}, 
+			#{programId}, 
+			#{programNm}, 
+			#{programType}, 
+			#{cornerId}, 
+			#{weekday}, 
+			#{broadId}, 
+			#{channelId}, 
+			#{loginUser},
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateProgram" parameterType="programVo">
+		UPDATE PROGRAM
+			<set>
+				<if test="opSeq != null and opSeq != 0 ">OP_SEQ=#{opSeq}, </if>
+				<if test="parentPSeq != null and parentPSeq != 0 ">PARENT_P_SEQ=#{parentPSeq}, </if>
+				<if test="cSeq != null and cSeq != 0 ">C_SEQ=#{cSeq}, </if>
+				<if test="programId != null and programId !='' ">PROGRAM_ID=#{programId}, </if>
+				<if test="programNm != null and programNm !='' ">PROGRAM_NM=#{programNm}, </if>
+				<if test="programType != null and programType !='' ">PROGRAM_TYPE=#{programType}, </if>
+				<if test="cornerId != null and cornerId !='' ">CORNER_ID=#{cornerId}, </if>
+				<if test="weekday != null and weekday !='' ">WEEKDAY=#{weekday}, </if>
+				<if test="broadId != null and broadId !='' ">BROAD_ID=#{broadId}, </if>
+				<if test="channelId != null and channelId !='' ">CHANNEL_ID=#{channelId}, </if>
+				UPDATE_ID=#{loginUser},
+				UPDATE_DT=NOW()
+			</set>
+		WHERE P_SEQ=#{pSeq}
+	</update>
+	
+</mapper>

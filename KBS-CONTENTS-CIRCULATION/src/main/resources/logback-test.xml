@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+	<property name="LOG_HOME" value="/home/tomcat/log"/> 
+	<!-- <property name="LOG_HOME" value="D:/KBS/log"/> -->
+	<property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36}[%method:%line] [%t] / %msg%n}"/>
+
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/dist.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>/svc/logs/pmu/my-web-app.log.%d{yyyy-MM-dd}.log.zip
+			</fileNamePattern>
+
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} -%M -%L - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-6level %logger{35} -%M -%L - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<logger name="kr.co.kbs" level="DEBUG" />
+	<logger name="org.springframework" level="ERROR" />
+	<logger name="org.mybatis" level="ERROR" />
+	<logger name="org.apache.ibatis" level="ERROR" />
+	<!-- Query Loggers -->
+	<logger name="jdbc.sqlonly" level="DEBUG" />
+	<logger name="jdbc.resultsettable" level="DEBUG" />
+	<!-- turn OFF all logging (children can override) -->
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>

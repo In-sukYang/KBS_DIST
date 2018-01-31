@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.company.CompanyDistTypeMapper">
+	
+	<select id="selectCompanyDistTypeList" parameterType="companyVo" resultType="companyDistTypeVo">
+		SELECT 
+			CDY_SEQ, C_SEQ, DIST_TYPE, 
+			(SELECT CODE_NM FROM CODE WHERE CODE_TYPE = '06' AND CODE_ID = A.DIST_TYPE) AS DIST_NAME,
+			USE_YN, INPUT_ID, INPUT_DT, 
+			UPDATE_ID, UPDATE_DT
+		FROM COMPANY_DIST_TYPE A
+		WHERE C_SEQ = #{cSeq}
+		AND USE_YN = 'Y'
+		ORDER BY CDY_SEQ
+		
+	</select>
+
+	<insert id="insertCompanyDistType" parameterType="companyDistTypeVo">
+		INSERT INTO COMPANY_DIST_TYPE (
+			C_SEQ, 
+			DIST_TYPE, 
+			USE_YN, 
+			INPUT_ID, 
+			INPUT_DT
+		) VALUES (
+			#{cSeq}, 
+			#{distType}, 
+			#{useYn}, 
+			#{loginUser}, 
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateCompanydistType" parameterType="companyDistTypeVo">
+		UPDATE COMPANY_DIST_TYPE SET
+		<set>
+			<if test="cdySeq != null and cdySeq !='' ">		CDY_SEQ=#{cdySeq}, </if>
+			<if test="cSeq != null and cSeq !='' ">			C_SEQ=#{cType}, </if>
+			<if test="distType != null and distType !='' ">	DIST_TYPE=#{distType}, </if>
+			<if test="useYn != null and useYn !='' ">		USE_YN=#{useYn}, </if>
+		UPDATE_ID=	#{loginUser}, 
+		UPDATE_DT=	NOW()
+		</set>
+		WHERE CDY_SEQ=#{cdySeq}
+	</update>
+	
+	<delete id="deleteComapnyDist" parameterType="companyParamVo">
+		DELETE FROM COMPANY_DIST_TYPE
+		WHERE CDY_SEQ IN
+		<foreach collection="cdySeq" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+</mapper>

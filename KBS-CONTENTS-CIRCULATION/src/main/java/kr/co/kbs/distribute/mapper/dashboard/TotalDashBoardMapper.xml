@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.dashboard.TotalDashBoardMapper">
+	<select id="selectTotalDashBoardTvVodList" resultType="tvVodTotalDashBoardVo" parameterType="dashBoardParamVo"> 
+		SELECT 
+			CHANNEL_ID, SUM(CHARGE_CNT) AS CHARGE_CNT 
+		FROM USAGE_STAT_PROGRAM
+		WHERE PRO_TYPE = 'PPM'
+		AND C_SEQ != 11
+		
+		<if test="cSeq != null and cSeq != '' and cSeq =='01'">
+			AND C_SEQ !=12
+		</if>
+		AND VIEW_DATE >= #{searchValue}
+		<![CDATA[AND VIEW_DATE <= #{searchValue2} ]]>
+		AND CHANNEL_ID IN ('KBS','MBC','SBS')
+		GROUP BY CHANNEL_ID
+	</select>
+	
+	<select id="selectTotalDashBoardPooqVodList" resultType="tvVodTotalDashBoardVo" parameterType="dashBoardParamVo"> 
+		SELECT 
+			CHANNEL_ID, SUM(CHARGE_CNT) AS CHARGE_CNT 
+		FROM USAGE_STAT_PROGRAM
+		WHERE PRO_TYPE = 'PPM'
+		AND C_SEQ = 11
+		AND VIEW_DATE >= #{searchValue}
+			
+		<![CDATA[AND VIEW_DATE <= #{searchValue2} ]]>
+		AND CHANNEL_ID IN ('KBS','MBC','SBS')
+		GROUP BY CHANNEL_ID
+	</select>
+	
+	<select id="selectTotalDashBoardTvVodListForCseq" resultType="tvVodTotalDashBoardVo" parameterType="dashBoardParamVo"> 
+		SELECT  AA.C_SEQ,AA.CHANNEL_ID,SUM(AA.CHARGE_CNT)  AS CHARGE_CNT
+		   FROM (
+			SELECT 
+					CASE C_SEQ WHEN 12 THEN 'KT' 
+						WHEN 13 THEN 'LG'		
+					 	WHEN 14 THEN 'SK'
+						ELSE 'CVOD' END AS C_SEQ,CHANNEL_ID,
+					 SUM(CHARGE_CNT) AS CHARGE_CNT,
+					 CASE C_SEQ WHEN 12 THEN '12' 
+						WHEN 13 THEN '13'		
+					 	WHEN 14 THEN '14'
+						ELSE '15' END AS  ORDERD
+				FROM USAGE_STAT_PROGRAM
+				WHERE PRO_TYPE = 'PPM'
+			AND C_SEQ != 11
+			<if test="cSeq != null and cSeq != '' and cSeq =='01'">
+				AND C_SEQ !=12
+			</if>
+			AND VIEW_DATE >= #{searchValue}
+			<![CDATA[AND VIEW_DATE <= #{searchValue2} ]]>
+				GROUP BY C_SEQ, CHANNEL_ID ,ORDERD
+			) AA GROUP BY AA.C_SEQ, AA.CHANNEL_ID,AA.ORDERD
+			ORDER BY AA.ORDERD,AA.CHANNEL_ID
+	</select>
+	
+	<select id="selectTotalDashBoardTopViewRating20" parameterType="dashBoardParamVo" resultType="tvVodTotalDashBoardVo">
+	<![CDATA[
+		SELECT 
+			(SELECT PROGRAM_NM FROM PROGRAM WHERE P_SEQ = A.P_SEQ) AS PROGRAM_NM,
+			(SELECT VODCNT FROM CONTENTS WHERE PC_SEQ = A.PC_SEQ) AS VODCNT,
+			SUM(VIEW_RATING) / COUNT(1) AS VIEW_RATING 
+		FROM DC_VIEW_RATING A
+		
+		WHERE BROAD_DATE >= replace(#{searchValue}, '-', '') 
+		AND BROAD_DATE <= replace(#{searchValue2}, '-', '')
+		AND STAT_CODE = '00'
+		AND P_SEQ != -1
+		GROUP BY CONTENTS_ID
+		ORDER BY SUM(VIEW_RATING) / COUNT(1)  DESC
+		LIMIT 0, 20
+	]]>
+	</select>
+	
+	<select id="getSmrClipCnt" parameterType="dashBoardParamVo" resultType="String">
+	<![CDATA[
+		select sum(view_cnt) totalCnt from clip
+		where view_date>=#{searchValue}
+		and view_date<=#{searchValue2}
+	]]>
+	</select>
+	
+	<select id="getPooqRealList" parameterType="dashBoardParamVo" resultType="tvVodTotalDashBoardVo">
+	<![CDATA[
+		select (select code_nm from code where code_type=18 and code_id=channel) as channelId, sum(age0_vcnt)+sum(age20_vcnt)+sum(age30_vcnt)+sum(age40_vcnt)+sum(age50_vcnt) as vodcnt
+		from usage_stat_channel
+		WHERE date_format(broad_date,'%Y%m%d') >=replace(#{searchValue}, '-', '')
+ 		 and date_format(broad_date,'%Y%m%d')<=replace(#{searchValue2}, '-', '') 
+		group by channelId
+	]]>
+	</select>
+	
+	<select id="getTvVodVCntList" parameterType="dashBoardParamVo" resultType="tvVodTotalDashBoardVo">
+	
+	SELECT AA.C_SEQ as channelId ,SUM(AA.CHARGE_CNT) as vodcnt FROM (
+		SELECT 
+					CASE C_SEQ WHEN 12 THEN 'KT' 
+						WHEN 13 THEN 'LG'		
+					 	WHEN 14 THEN 'SK'
+						ELSE 'CVOD' END AS C_SEQ,
+					 SUM(CHARGE_CNT) AS CHARGE_CNT
+				FROM USAGE_STAT_PROGRAM
+				WHERE PRO_TYPE = 'PPV'
+				AND C_SEQ != 11
+				<if test="cSeq != null and cSeq != '' and cSeq =='01'">
+					AND C_SEQ !=12
+				</if>
+				<![CDATA[
+				and VIEW_DATE >= STR_TO_DATE(replace(#{searchValue}, '-', '') ,'%Y%m%d') 
+				and VIEW_DATE <=STR_TO_DATE(replace(#{searchValue2}, '-', '') ,'%Y%m%d')
+				]]>
+				AND CHANNEL_ID ='KBS'
+				GROUP BY C_SEQ
+		) AA group by AA.C_SEQ
+	
+	</select>
+	
+	
+	
+</mapper>

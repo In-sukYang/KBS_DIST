@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.program.UsageStatProgramMapper">
+	<select id="selectDateYear" resultType="String">
+		SELECT TT.VIEW_DATE FROM (
+			SELECT DATE_FORMAT(VIEW_DATE,'%Y') AS VIEW_DATE FROM USAGE_STAT_PROGRAM 
+		)TT 
+		WHERE TT.VIEW_DATE IS NOT NULL
+		GROUP BY TT.VIEW_DATE
+	</select>
+	
+	<select id="selectUsageStatProgramList" parameterType="programParamVo" resultType="usageStatProgramVo">
+		SELECT TT.* FROM (
+			SELECT 
+				A.usp_seq, A.op_seq, A.pc_seq, A.c_seq, A.tg_seq, 
+				DATE_FORMAT(A.VIEW_DATE,'%Y-%m-%d %H:%i:%S') as view_date, A.pro_type, A.screen_type, A.charge_yn, 
+				A.amount, A.total_amount, A.charge_cnt, A.h_charge_cnt,  
+				A.free_charge_cnt, A.h_free_charge_cnt, A.charge_vtime, 
+				A.h_charge_vtime, A.free_charge_vtime, A.h_free_charge_vtime, A.TEMP_DATA, 
+				A.join_cnt, B.PROGRAM_NM, C.CONTENTS_NM, C.BROAD_DATE, A.CHANNEL_ID,
+				(SELECT CODE_NM FROM CODE WHERE CODE_TYPE ='12' AND CODE_ID = B.BROAD_ID) AS BROAD_NM,
+				(SELECT O_PROGRAM_NM FROM ORG_PROGRAM WHERE OP_SEQ = A.OP_SEQ ) AS O_PROGRAM_NM
+				
+			FROM usage_stat_program A, PROGRAM B, CONTENTS C 
+			WHERE A.PC_SEQ=C.PC_SEQ 
+			AND B.P_SEQ=C.P_SEQ 
+			AND C.REVIEW_YN ='N'
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					<![CDATA[
+					AND A.VIEW_DATE >= CONCAT(#{searchValue}, '-01')
+					AND A.VIEW_DATE <= CONCAT(#{searchValue}, '-31')
+					]]> 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					<![CDATA[
+						AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+					]]>
+				</if>
+			</if>
+			<if test="proType !=null and proType!=''">
+				AND A.PRO_TYPE = #{proType}
+			</if>
+		)TT
+		<where>
+			<if test="searchValue3 !=null and searchValue3 !=''">
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '01'">
+					AND TT.PROGRAM_NM like CONCAT('%',#{searchValue3},'%')
+				</if>
+				
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '02'">
+					AND TT.CONTENTS_NM like CONCAT('%',#{searchValue3},'%')
+				</if>
+				
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '03'">
+					AND TT.BROAD_NM LIKE CONCAT('%',#{searchValue3},'%')
+				</if>
+			</if>
+		</where>
+		ORDER BY TT.USP_SEQ
+		LIMIT #{offset}, #{noOfRecords}
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="programParamVo" resultType="int">
+       SELECT count(*) FROM (
+			SELECT 
+				A.usp_seq, A.op_seq, A.pc_seq, A.c_seq, A.tg_seq, 
+				A.view_date, A.pro_type, A.screen_type, A.charge_yn, 
+				A.amount, A.total_amount, A.charge_cnt, A.h_charge_cnt,  
+				A.free_charge_cnt, A.h_free_charge_cnt, A.charge_vtime, 
+				A.h_charge_vtime, A.free_charge_vtime, A.h_free_charge_vtime, 
+				A.join_cnt, B.PROGRAM_NM, C.CONTENTS_NM, C.BROAD_DATE ,
+				(SELECT CODE_NM FROM CODE WHERE CODE_TYPE ='12' AND CODE_ID = B.BROAD_ID) AS BROAD_NM
+			FROM usage_stat_program A, PROGRAM B, CONTENTS C 
+			WHERE A.PC_SEQ=C.PC_SEQ 
+			AND B.P_SEQ=C.P_SEQ 
+			AND C.REVIEW_YN ='N'
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					<![CDATA[
+					AND A.VIEW_DATE >= CONCAT(#{searchValue}, '-01')
+					AND A.VIEW_DATE <= CONCAT(#{searchValue}, '-31')
+					]]> 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND A.VIEW_DATE = #{searchValue} 
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '03'">
+					<![CDATA[
+						AND A.VIEW_DATE >= #{searchValue} AND A.VIEW_DATE <= #{searchValue2}
+					]]>
+				</if>
+			</if>
+			<if test="proType !=null and proType!=''">
+				AND A.PRO_TYPE = #{proType}
+			</if>
+		)TT
+		<where>
+			<if test="searchValue3 !=null and searchValue3 !=''">
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '01'">
+					AND TT.PROGRAM_NM like CONCAT('%',#{searchValue3},'%')
+				</if>
+				
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '02'">
+					AND TT.CONTENTS_NM like CONCAT('%',#{searchValue3},'%')
+				</if>
+				
+				<if test="searchType2 != null and searchType2 !='' and searchType2 == '03'">
+					AND TT.BROAD_NM LIKE CONCAT('%',#{searchValue3},'%')
+				</if>
+			</if>
+		</where>
+		
+    </select>
+    
+    <insert id="insertUsageStatProgram" parameterType="usageStatProgramVo">
+    	INSERT INTO usage_stat_program(
+    		op_seq, 
+    		pc_seq, 
+    		c_seq, 
+    		tg_seq, 
+    		view_date, 
+    		pro_type, 
+    		screen_type, 
+    		charge_yn, 
+    		amount, 
+    		total_amount, 
+    		charge_cnt, 
+    		h_charge_cnt, 
+    		free_charge_cnt,
+    		h_free_charge_cnt, 
+    		charge_vtime, 
+    		h_charge_vtime, 
+    		free_charge_vtime, 
+    		h_free_charge_vtime, 
+    		join_cnt, 
+    		channel_id, 
+    		temp_data,
+    		input_id, 
+    		input_dt
+    		)VALUES (
+    			#{opSeq}, 
+	    		#{pcSeq}, 
+	    		#{cSeq}, 
+	    		#{tgSeq}, 
+	    		#{viewDate}, 
+	    		#{proType}, 
+	    		#{screenType}, 
+	    		#{chargeYn}, 
+	    		#{amount}, 
+	    		#{totalAmount}, 
+	    		#{chargeCnt}, 
+	    		#{hChargeCnt}, 
+	    		#{freeChargeCnt},
+	    		#{hFreeChargeCnt}, 
+	    		#{chargeVtime}, 
+	    		#{hChargeVtime}, 
+	    		#{freeChargeVtime}, 
+	    		#{hFreeChargeVtime}, 
+	    		#{joinCnt}, 
+	    		#{channelId}, 
+	    		#{tempData},
+	    		#{loginUser}, 
+	    		NOW()
+	    	)
+    
+    </insert>
+    
+    
+    <delete id="deleteUsageStatProgram">
+    	DELETE FROM USAGE_STAT_PROGRAM
+    	<where>
+    		<if test="uspSeq != null and uspSeq != 0">
+    			AND USP_SEQ = #{uspSeq}
+    		</if>
+    		
+    		<if test="tgSeq != null and tgSeq != 0">
+    			AND tgSeq = #{tgSeq}
+    		</if>
+    	</where>
+    
+    </delete>
+    
+</mapper>

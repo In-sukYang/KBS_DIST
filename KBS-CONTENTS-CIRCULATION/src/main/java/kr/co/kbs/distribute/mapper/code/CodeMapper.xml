@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.kbs.distribute.mapper.code.CodeMapper">
+	
+	<select id="selectCodeListByCodeVo" parameterType="codeVo" resultType="codeVo">
+		SELECT 
+			CODE_SEQ, CODE_TYPE, CODE_ID, CODE_NM, USE_YN
+		FROM CODE
+		<where>
+			<if test="codeType !=null and  codeType !=''">
+				AND CODE_TYPE = #{codeType}
+			</if>
+			
+			<if test="codeId !=null and  codeId !=''">
+				AND CODE_ID = #{codeId}
+			</if>
+			
+			<if test="codeNm !=null and  codeNm !=''">
+				AND CODE_NM = #{codeNm}
+			</if>
+			
+			<choose>
+				<when test="useYn !=null and  useYn !=''">
+					AND USE_YN = #{useYn}
+				</when>
+				<otherwise>
+					AND USE_YN = 'Y'
+				</otherwise>
+			</choose>
+			ORDER BY CODE_SEQ
+		</where>
+	</select>
+	
+	
+	<select id="selectCodeTypeList" parameterType="codeParamVo" resultType="codeVo">
+		SELECT 
+			CODE_SEQ, CODE_TYPE, CODE_ID, CODE_NM, USE_YN
+		FROM CODE
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CODE_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CODE_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+			</if>
+			
+			<choose>
+				<when test="useYn !=null and  useYn !=''">
+					AND USE_YN = #{useYn}
+				</when>
+				<otherwise>
+					AND USE_YN = 'Y'
+				</otherwise>
+			</choose>
+		</where>
+		ORDER BY CODE_SEQ
+		LIMIT #{offset}, #{noOfRecords} 
+	</select>
+	
+	<select id="selectTotalRecords" parameterType="codeParamVo" resultType="int">
+		SELECT 
+			COUNT(CODE_SEQ)
+		FROM CODE
+		<where>
+			<if test="searchValue !=null and searchValue !=''">
+				<if test="searchType != null and searchType !='' and searchType == '01'">
+					AND CODE_ID like CONCAT('%',#{searchValue},'%')
+				</if>
+				<if test="searchType != null and searchType !='' and searchType == '02'">
+					AND CODE_NM like CONCAT('%',#{searchValue},'%')
+				</if>
+				
+			</if>
+			
+			<choose>
+				<when test="useYn !=null and  useYn !=''">
+					AND USE_YN = #{useYn}
+				</when>
+				<otherwise>
+					AND USE_YN = 'Y'
+				</otherwise>
+			</choose>
+		</where>
+	
+	</select>
+	
+	<insert id="insertCode" parameterType="codeVo">
+		INSERT INTO CODE(
+			CODE_TYPE, 
+			CODE_ID, 
+			CODE_NM, 
+			USE_YN, 
+			INPUT_ID, 
+			INPUT_DT
+		)VALUES(
+			#{codeType}, 
+			#{codeId}, 
+			#{codeNm}, 
+			#{useYn}, 
+			#{loginUser}, 
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateCode" parameterType="codeVo">
+		UPDATE CODE
+			<set>
+				<if test="codeType != null and codeType !='' ">CODE_TYPE=#{codeType}, </if>
+				<if test="codeId != null and codeId !='' ">CODE_ID=#{codeId}, </if>
+				<if test="codeNm != null and codeNm !='' ">CODE_NM=#{codeNm}, </if>
+				<if test="useYn != null and useYn !='' ">USE_YN=#{useYn}, </if>
+				UPDATE_ID=#{loginUser},
+				UPDATE_DT=NOW()
+			</set>
+		WHERE CODE_SEQ=#{codeSeq}
+	</update>
+	
+	<delete id="deleteCode" parameterType="codeVo">
+		DELETE FROM CODE
+		WHERE CODE_SEQ IN
+		<foreach collection="codeList" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

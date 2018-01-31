@@ -1,0 +1,90 @@
+@charset "utf-8";
+
+/* 화면낭독기 사용자용 */
+#hd_login_msg {position:absolute;top:0;left:0;font-size:0;line-height:0;overflow:hidden}
+.msg_sound_only, .sound_only {display:inline-block !important;position:absolute;top:0;left:0;margin:0 !important;padding:0 !important;font-size:0 !important;line-height:0 !important;border:0 !important;overflow:hidden !important}
+/* 본문 바로가기 */
+#skip_to_container a {z-index:100000; position:absolute;top:0;left:0;width:1px;height:1px;font-size:0;line-height:0;overflow:hidden}
+#skip_to_container a:focus, #skip_to_container a:active {width:100%;height:75px;background:#21272e;color:#fff;font-size:2em;font-weight:bold;text-align:center;text-decoration:none;line-height:3.3em}
+
+body { border-top: 6px solid #f79646;}
+#wrap { overflow: hidden; width: 1280px; margin: 0 auto;}
+#wrap.login { width: 100%;}
+#wrap.login #container { position: inherit; }
+
+#hd { width: 229px; margin: 0; padding: 0; float: left; height: 100%; position: relative; }
+#hd_h1 {position:absolute;font-size:0;line-height:0;overflow:hidden}
+
+#logo { display: block;padding-left: 33px; height: 90px; line-height: 90px; background: #f6f7f9; border-bottom: 1px solid #d8d8d8;}
+
+#container { float: left; width: 1050px; min-height: 808px; padding-bottom: 92px; position: relative; border-left: 1px solid #d8d8d8; }
+
+.gnb {}
+.gnb > ul {}
+.gnb > ul > li { border-bottom: 1px solid #d8d8d8;}
+.gnb > ul > li > a { display: block; height: 60px; line-height: 60px; padding-left: 45px; font-size: 16px; color: #636363; }
+.gnb > ul > li > a:hover, .gnb > ul > li > a.active { font-size: 18px; color: #2e72c7; font-weight: bold;}
+.gnb > ul > li > a > span { display: inline-block; width: 100%; background: url(../img/ico/ico-arr.png) no-repeat 160px center;}
+.gnb > ul > li > a.active > span,.gnb > ul > li > a:hover > span { background: url(../img/ico/ico-arr-ov.png) no-repeat 160px center;}
+.gnb > ul > li.gnb01 > a { background: url(../img/ico/ico-gnb01.png) 24px center no-repeat;}
+.gnb > ul > li.gnb01 > a.active,.gnb > ul > li.gnb01 > a:hover { background: url(../img/ico/ico-gnb01-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb02 > a { background: url(../img/ico/ico-gnb02.png) 24px center no-repeat;}
+.gnb > ul > li.gnb02 > a.active,.gnb > ul > li.gnb02 > a:hover{ background: url(../img/ico/ico-gnb02-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb03 > a { background: url(../img/ico/ico-gnb03.png) 24px center no-repeat;}
+.gnb > ul > li.gnb03 > a.active,.gnb > ul > li.gnb03 > a:hover { background: url(../img/ico/ico-gnb03-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb04 > a { background: url(../img/ico/ico-gnb04.png) 24px center no-repeat;}
+.gnb > ul > li.gnb04 > a.active,.gnb > ul > li.gnb04 > a:hover { background: url(../img/ico/ico-gnb04-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb05 > a { background: url(../img/ico/ico-gnb05.png) 24px center no-repeat;}
+.gnb > ul > li.gnb05 > a.active,.gnb > ul > li.gnb05 > a:hover { background: url(../img/ico/ico-gnb05-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb06 > a { background: url(../img/ico/ico-gnb06.png) 24px center no-repeat;}
+.gnb > ul > li.gnb06 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb06-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb07 > a { background: url(../img/ico/ico-gnb07.png) 24px center no-repeat;}
+.gnb > ul > li.gnb07 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb07-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb08 > a { background: url(../img/ico/ico-gnb08.png) 24px center no-repeat;}
+.gnb > ul > li.gnb08 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb08-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb09 > a { background: url(../img/ico/ico-gnb09.png) 24px center no-repeat;}
+.gnb > ul > li.gnb09 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb09-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb10 > a { background: url(../img/ico/ico-gnb10.png) 24px center no-repeat;}
+.gnb > ul > li.gnb10 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb10-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb11 > a { background: url(../img/ico/ico-gnb11.png) 24px center no-repeat;}
+.gnb > ul > li.gnb11 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb11-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb50 > a { background: url(../img/ico/ico-gnb01.png) 24px center no-repeat;}
+.gnb > ul > li.gnb50 > a.active,.gnb > ul > li.gnb01 > a:hover { background: url(../img/ico/ico-gnb01-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb51 > a { background: url(../img/ico/ico-gnb02.png) 24px center no-repeat;}
+.gnb > ul > li.gnb51 > a.active,.gnb > ul > li.gnb02 > a:hover{ background: url(../img/ico/ico-gnb02-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb52 > a { background: url(../img/ico/ico-gnb03.png) 24px center no-repeat;}
+.gnb > ul > li.gnb52 > a.active,.gnb > ul > li.gnb03 > a:hover { background: url(../img/ico/ico-gnb03-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb53 > a { background: url(../img/ico/ico-gnb04.png) 24px center no-repeat;}
+.gnb > ul > li.gnb53 > a.active,.gnb > ul > li.gnb04 > a:hover { background: url(../img/ico/ico-gnb04-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb54 > a { background: url(../img/ico/ico-gnb05.png) 24px center no-repeat;}
+.gnb > ul > li.gnb54 > a.active,.gnb > ul > li.gnb05 > a:hover { background: url(../img/ico/ico-gnb05-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb55 > a { background: url(../img/ico/ico-gnb06.png) 24px center no-repeat;}
+.gnb > ul > li.gnb55 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb06-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb56 > a { background: url(../img/ico/ico-gnb07.png) 24px center no-repeat;}
+.gnb > ul > li.gnb56 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb07-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb57 > a { background: url(../img/ico/ico-gnb08.png) 24px center no-repeat;}
+.gnb > ul > li.gnb57 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb08-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb58 > a { background: url(../img/ico/ico-gnb09.png) 24px center no-repeat;}
+.gnb > ul > li.gnb58 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb09-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb59 > a { background: url(../img/ico/ico-gnb10.png) 24px center no-repeat;}
+.gnb > ul > li.gnb59 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb10-ov.png) 24px center no-repeat;}
+.gnb > ul > li.gnb60 > a { background: url(../img/ico/ico-gnb11.png) 24px center no-repeat;}
+.gnb > ul > li.gnb60 > a.active,.gnb > ul > li.gnb06 > a:hover { background: url(../img/ico/ico-gnb11-ov.png) 24px center no-repeat;}
+.gnb > ul > li > ul { display: none; background: #f4f9fb; border-top: 1px solid #dae9f4; }
+.gnb > ul > li > ul.active { display: block; }
+.gnb > ul > li > ul > li { line-height: 38px; }
+.gnb > ul > li > ul > li > a { display: block; padding-left: 40px; line-height: 38px; font-size: 15px; color: #2e72c7; background: url(../img/common/gnb-dot.png) no-repeat 27px center; }
+.gnb > ul > li > ul > li > a:hover,.gnb > ul > li > ul > li > a.active { color: #fff; background: #2e72c7 url(../img/common/gnb-dot-ov.png) no-repeat 27px center;}
+
+.tnb { position: absolute; overflow: hidden; right: 38px; top: 20px; }
+.tnb > a { float: left; display: inline-block; background: url(../img/ico/ico-dw.png) no-repeat left center; padding-left: 22px; font-size: 12px; letter-spacing: -0.01em; color:#636363 !important; line-height: 25px;}
+.tnb > ul { float: left; overflow: hidden;}
+.tnb > ul > li { float: left; border-left: 1px solid #eaeaea; margin-left: 10px; padding-left: 10px;  }
+.tnb > ul > li:first-child { border-left: none;}
+.tnb > ul > li > a { font-size: 12px; letter-spacing: -0.01em; color:#636363; display: inline-block; line-height: 25px;}
+
+.nav { margin: 20px 0px 0px 40px; color: #898989; font-size: 12px; font-family: 'NanumSquare'; font-weight: 400; }
+.nav span { color: #000;}
+
+#ft { width: 100%; background: #959595; position: relative; clear: both; }
+#ft .footer { text-align: right; padding: 0px 40px; line-height: 72px; font-size: 12px; color: #fff; font-weight: bold; opacity: 0.7; filter: alpha(opacity=70);}
